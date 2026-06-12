@@ -1,0 +1,176 @@
+* orgmode-daedalus
+
+  A parser and pretty-printer for the Org-Mode (https://orgmode.org) document
+  format.
+
+  - Parsing is implemented using the
+    Galois Daedalus (https://github.com/GaloisInc/daedalus) parser (which
+    permits generation of C, C++, and Rust parsers as well).
+
+    + Parsing errors are reported via
+      the diagnose (https://hackage.haskell.org/package/diagnose) package.
+
+  - Pretty-printing is implemented using
+    the sayable (https://hackage.haskell.org/package/sayable) package.
+
+  Development and usage is supported by
+  the eng (https://github.com/GaloisInc/eng) tool. Install this tool and
+  type `eng' in this directory for more information.
+
+
+
+* OrgMode support details
+
+  Note that structural and markup parsing are distinct operations: markup is
+  parsed entirely within each individual structural element.
+
+** Structural parsing [41%]
+
+*** Headers [75%]
+
+**** DONE text
+
+
+**** DONE TODO
+
+
+**** DONE priority
+
+
+**** TODO tags
+
+
+*** DONE paragraphs
+
+
+*** DONE lists
+
+  - splat
+
+  - dash
+
+  - plus
+
+  - enumerated
+
+  - checkboxes [%]
+
+    - [ ] one
+
+    - [-] two
+
+    - [X] three
+
+
+
+*** DONE link
+
+
+*** DONE Blocks
+
+      "Don't be shy...
+       Go and say hello
+       ---Mother"
+
+  The program
+
+      [C]
+      int main(int argc, char** argv) {
+          printf("Hello, world!");
+      }
+
+  produces
+
+          Hello, world!
+          
+
+  when it is run.
+
+        I'm truly wounded
+        Like a fox in a snare.
+        I feel inspected,
+        'Cause I'm caught in your glare.
+
+                                     The End
+
+
+
+*** DONE Settings
+
+
+*** TODO Tables
+
+
+*** TODO Footnotes
+
+
+*** TODO Comments
+
+
+*** TODO Horizontal Rules
+
+
+*** TODO captions
+
+
+*** TODO dates
+
+  Note: the TODO state change lines are not indented!
+
+
+
+** Markup parsing [85%]
+
+*** DONE bold
+
+
+*** DONE underline
+
+
+*** DONE italic
+
+
+*** DONE link
+
+
+*** DONE link target
+
+
+*** DONE radio target
+
+
+*** TODO radio target references
+
+
+* Alternatives
+
+** Parsing
+
+  - org-mode (https://hackage.haskell.org/package/org-mode)
+
+    + list items can only be simple text.
+
+    + not responsive to github engagement
+
+    + supports output as minimal org source, but no pretty-printing
+
+  - org-parser (https://hackage.haskell.org/package/org-parser)
+
+    1. May be more complete than this library.
+
+    2. Uses a templating system (ondim) for pretty-printing (exporting) to
+       different formats.
+
+  - orgmode (https://hackage.haskell.org/package/orgmode)
+
+    + built on Parsec library
+
+  - orgmode-parse (https://hackage.haskell.org/package/orgmode-parse)
+
+    + built on Attoparsec
+
+    + no markup or block support
+
+    + no pretty-printing
+
+

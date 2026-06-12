@@ -1,0 +1,93 @@
+cabal-version:      3.0
+name:               orgmode-daedalus
+version:            0.1.0.0
+synopsis:           Parser/printer for Emacs Org-Mode using Daedalus.
+description:
+   Parser and pretty-printer for the Org-Mode document format.
+   .
+   Parsing is implemented using the Galois Daedalus parser (which
+   permits generation of C, C++, and Rust parsers as well).
+   .
+   Parsing errors are reported via the Diagnose package.
+   .
+   Pretty-printing is implemented using the Sayable package.
+   
+license:            BSD-3-Clause
+license-file:       LICENSE
+author:             Kevin Quick
+maintainer:         kq1quick@gmail.com
+copyright:          Kevin Quick, 2026.
+category:           Data
+build-type:         Simple
+
+extra-doc-files:    CHANGELOG.md
+
+extra-source-files: ddl/org-mode.ddl
+
+common config
+    ghc-options: -Wall
+
+library
+    import:           config
+    default-language: Haskell2010
+    hs-source-dirs:   src
+    exposed-modules:  OrgMode
+                      Daedalus.Diagnostic
+    other-modules:    OrgMode.Markup
+                      OrgMode.Parse
+                      OrgMode.Sayable
+                      OrgMode.Sayable.Defs
+                      OrgMode.Sayable.Text
+                      OrgMode.Sayable.TextStyle1
+                      OrgMode.Sayable.HTML
+    -- other-extensions:
+    build-depends:    base >=4.10 && <4.23
+                    , diagnose >= 2.5 && < 2.6
+                    , daedalus >= 0.1 && < 1.1
+                    , named-text >= 1.1 && < 1.3
+                    , panic
+                    , prettyprinter >= 1.7.0 && < 1.8
+                    , rts-hs-data >= 0.1 && < 0.2
+                    , rts-vm-hs >= 0.1 && < 0.2
+                    , sayable >= 1.2.4 && < 1.3
+                    , text
+                    , template-haskell
+
+executable orgmode
+    import:           config
+    default-language: Haskell2010
+    main-is:          Main.hs
+    hs-source-dirs:   app
+    other-modules:    Paths_orgmode_daedalus
+    autogen-modules:  Paths_orgmode_daedalus
+    build-depends:    base
+                    , named-text
+                    , optparse-applicative
+                    , orgmode-daedalus
+                    , sayable
+                    , text
+
+test-suite orgmode-daedalus-test
+    import:           config
+    default-language: Haskell2010
+    type:             exitcode-stdio-1.0
+    hs-source-dirs:   test
+    main-is:          Main.hs
+    other-modules:    TestOrgMode
+    build-depends:    base
+                    , exceptions
+                    , hspec >= 2.10 && < 2.12
+                    , HUnit >= 1.6 && < 1.7
+                    , named-text
+                    , orgmode-daedalus
+                    , parameterized-utils
+                    , rts-hs-data
+                    , rts-vm-hs
+                    , sayable
+                    , tasty
+                    , tasty-ant-xml
+                    , tasty-checklist >= 1.0.3 && < 1.1
+                    , tasty-hspec
+                    , tasty-hunit
+                    , tasty-sugar
+                    , text

@@ -1,0 +1,271 @@
+{
+  "nodes": {
+    "alex-tools-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1757957679,
+        "narHash": "sha256-UqQntCLKwDVczDFhodPR3YVSIHiynd2iXnPZ/2GNRZg=",
+        "owner": "GaloisInc",
+        "repo": "alex-tools",
+        "rev": "332ab046786cc3a1ff9e320a1df388de71070131",
+        "type": "github"
+      },
+      "original": {
+        "owner": "GaloisInc",
+        "repo": "alex-tools",
+        "type": "github"
+      }
+    },
+    "bv-sized-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1773152632,
+        "narHash": "sha256-ezLWymzZ4TTPZeGZVTI6eCjJiSeXrsNllq8dgWp+LaY=",
+        "owner": "GaloisInc",
+        "repo": "bv-sized",
+        "rev": "45a1faf625fa75982cfa0c7bae66d2ae7d139b1c",
+        "type": "github"
+      },
+      "original": {
+        "owner": "GaloisInc",
+        "repo": "bv-sized",
+        "type": "github"
+      }
+    },
+    "daedalus-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1779990279,
+        "narHash": "sha256-BlYOF1Vm1npLtHmkHzte+Mb3mU6en18v9KMu6QjqVzc=",
+        "owner": "galoisinc",
+        "repo": "daedalus",
+        "rev": "55abc74af6b9afe055a0623b12387f8ff34bbf54",
+        "type": "github"
+      },
+      "original": {
+        "owner": "galoisinc",
+        "repo": "daedalus",
+        "type": "github"
+      }
+    },
+    "diagnose-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1697702474,
+        "narHash": "sha256-qa39M2RngTiCz7uQu/Izb0iDGlLj77GBoYJ82Dm+7Tc=",
+        "owner": "mesabloo",
+        "repo": "diagnose",
+        "rev": "d3ffbb7f376ddc64f3f349fe3a6a8e49d405cde0",
+        "type": "github"
+      },
+      "original": {
+        "owner": "mesabloo",
+        "repo": "diagnose",
+        "type": "github"
+      }
+    },
+    "language-rust-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1776462813,
+        "narHash": "sha256-zJgdLkUyEBs+0rsUwr+z201o2VpHLcvRcUJfbqvYQSQ=",
+        "owner": "GaloisInc",
+        "repo": "language-rust",
+        "rev": "72b9e6182768d50b491997a1b1e6d683864dbb2e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "GaloisInc",
+        "repo": "language-rust",
+        "type": "github"
+      }
+    },
+    "levers": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1768050190,
+        "narHash": "sha256-xjWlwQpodI/YA/92fFjWAM7MQeUjNkP6FIUv8RyT41g=",
+        "owner": "kquick",
+        "repo": "nix-levers",
+        "rev": "1ba59d23c84bf0699b4a82ffcf154ec832ffabeb",
+        "type": "github"
+      },
+      "original": {
+        "owner": "kquick",
+        "repo": "nix-levers",
+        "type": "github"
+      }
+    },
+    "microlens-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1758506353,
+        "narHash": "sha256-m4qQXZcHffx1OW1a6JVX3d/XzfSL9cFcTUR+O8yyFYo=",
+        "owner": "stevenfontanella",
+        "repo": "microlens",
+        "rev": "7d509d465c54dba45b182f9c60452b3b3aa71d1a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "stevenfontanella",
+        "repo": "microlens",
+        "type": "github"
+      }
+    },
+    "microlens-src_2": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1758506353,
+        "narHash": "sha256-m4qQXZcHffx1OW1a6JVX3d/XzfSL9cFcTUR+O8yyFYo=",
+        "owner": "monadfix",
+        "repo": "microlens",
+        "rev": "7d509d465c54dba45b182f9c60452b3b3aa71d1a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "monadfix",
+        "repo": "microlens",
+        "type": "github"
+      }
+    },
+    "named-text": {
+      "inputs": {
+        "levers": [
+          "levers"
+        ],
+        "microlens-src": [
+          "microlens-src"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "parameterized-utils-src": [
+          "parameterized-utils-src"
+        ],
+        "sayable": [
+          "sayable"
+        ],
+        "tasty-checklist": [
+          "tasty-checklist"
+        ]
+      },
+      "locked": {
+        "lastModified": 1780460419,
+        "narHash": "sha256-XgHDYH+fNfI5JD0BRQUXmUEy5x3+fETBuIQEN6/JXa4=",
+        "owner": "kquick",
+        "repo": "named-text",
+        "rev": "a2a51c80a0df48a1271dcfa8f21f414a336da1c4",
+        "type": "github"
+      },
+      "original": {
+        "owner": "kquick",
+        "repo": "named-text",
+        "type": "github"
+      }
+    },
+    "nixpkgs": {
+      "locked": {
+        "lastModified": 1780336545,
+        "narHash": "sha256-vhVhuXzFrIOfcssC/9hDHx7MHzDKjF3keHuREOQqQiQ=",
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "4df1b885d76a54e1aa1a318f8d16fd6005b6401f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos",
+        "ref": "nixpkgs-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "parameterized-utils-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1778190350,
+        "narHash": "sha256-IY58yJYau4G1u1GLk1KSKgigEZFXfO+LkQobxOSyIbM=",
+        "owner": "GaloisInc",
+        "repo": "parameterized-utils",
+        "rev": "347810381eee9417a6cdf738be4deef488e3ff1b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "GaloisInc",
+        "repo": "parameterized-utils",
+        "type": "github"
+      }
+    },
+    "root": {
+      "inputs": {
+        "alex-tools-src": "alex-tools-src",
+        "bv-sized-src": "bv-sized-src",
+        "daedalus-src": "daedalus-src",
+        "diagnose-src": "diagnose-src",
+        "language-rust-src": "language-rust-src",
+        "levers": "levers",
+        "microlens-src": "microlens-src",
+        "named-text": "named-text",
+        "nixpkgs": "nixpkgs",
+        "parameterized-utils-src": "parameterized-utils-src",
+        "sayable": "sayable",
+        "tasty-checklist": "tasty-checklist"
+      }
+    },
+    "sayable": {
+      "inputs": {
+        "levers": [
+          "levers"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1767578011,
+        "narHash": "sha256-XHABeHA9Ca8+X88kdSP0g+tyQExScPgOqrEfC7jmEIY=",
+        "owner": "kquick",
+        "repo": "sayable",
+        "rev": "24a600ee82f855329b1dc0a6ba9106ec46215b7a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "kquick",
+        "repo": "sayable",
+        "type": "github"
+      }
+    },
+    "tasty-checklist": {
+      "inputs": {
+        "levers": [
+          "levers"
+        ],
+        "microlens-src": "microlens-src_2",
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "parameterized-utils-src": [
+          "parameterized-utils-src"
+        ]
+      },
+      "locked": {
+        "lastModified": 1778241747,
+        "narHash": "sha256-mwZjo4gbvChEOaFlOWROt9IRfnDtoYHWl495val3BH4=",
+        "owner": "kquick",
+        "repo": "tasty-checklist",
+        "rev": "75eace97f0b8cface6f4545b63055b3e0084c166",
+        "type": "github"
+      },
+      "original": {
+        "owner": "kquick",
+        "repo": "tasty-checklist",
+        "type": "github"
+      }
+    }
+  },
+  "root": "root",
+  "version": 7
+}

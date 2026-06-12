@@ -1,0 +1,167 @@
+
+<h1>orgmode-daedalus</h1>
+<p>
+A parser and pretty-printer for the <a href="https://orgmode.org">Org-Mode</a> document format.
+</p>
+<ul>
+<li>Parsing is implemented using the Galois <a href="https://github.com/GaloisInc/daedalus">Daedalus</a> parser (which permits
+generation of C, C++, and Rust parsers as well).
+<ul>
+<li>Parsing errors are reported via the <a href="https://hackage.haskell.org/package/diagnose">diagnose</a> package.</li>
+</ul></li>
+<li>Pretty-printing is implemented using the <a href="https://hackage.haskell.org/package/sayable">sayable</a> package.</li>
+</ul>
+<p>
+Development and usage is supported by the <a href="https://github.com/GaloisInc/eng">eng</a> tool. Install this tool and type <span class="code">eng</span> in this directory for more information.
+</p>
+
+<h1>OrgMode support details</h1>
+<p>
+Note that structural and markup parsing are distinct operations: markup is parsed
+entirely within each individual structural element.
+</p>
+<h2>Structural parsing [41%]</h2>
+
+<h3>Headers [75%]</h3>
+
+<h4><span class="TODO TODO-DONE">DONE</span> text</h4>
+
+
+<h4><span class="TODO TODO-DONE">DONE</span> TODO</h4>
+
+
+<h4><span class="TODO TODO-DONE">DONE</span> priority</h4>
+
+
+<h4><span class="TODO TODO-TODO">TODO</span> tags</h4>
+
+
+<h3><span class="TODO TODO-DONE">DONE</span> paragraphs</h3>
+
+
+<h3><span class="TODO TODO-DONE">DONE</span> lists</h3>
+<ul>
+<li>splat</li>
+<li>dash</li>
+<li>plus</li>
+<li>enumerated</li>
+<li>checkboxes [%]
+<ul>
+<li><span class="Checkbox Checkbox-Empty">[ ]</span> one</li>
+<li><span class="Checkbox Checkbox-InProg">[-]</span> two</li>
+<li><span class="Checkbox Checkbox-Marked">[X]</span> three</li>
+</ul></li>
+</ul>
+
+<h3><span class="TODO TODO-DONE">DONE</span> link</h3>
+
+
+<h3><span class="TODO TODO-DONE">DONE</span> Blocks</h3>
+<blockquote>
+<p>
+    Don't be shy&hellip;
+    Go and say hello
+    &mdash;Mother
+</p>
+</blockquote>
+<p>
+The program
+</p>
+<pre class="src src-C"><code>
+int main(int argc, char** argv) {
+    printf("Hello, world!");
+}
+</code></pre>
+<p>
+produces
+</p>
+<pre class="example">
+    Hello, world!
+    
+</pre>
+<p>
+when it is run.
+</p>
+<div class="verse">
+I'm truly wounded<br/>
+Like a fox in a snare.<br/>
+I feel inspected,<br/>
+'Cause I'm caught in your glare.<br/>
+</div>
+<div class="center">
+The End
+</div>
+
+<h3><span class="TODO TODO-DONE">DONE</span> Settings</h3>
+
+
+<h3><span class="TODO TODO-TODO">TODO</span> Tables</h3>
+
+
+<h3><span class="TODO TODO-TODO">TODO</span> Footnotes</h3>
+
+
+<h3><span class="TODO TODO-TODO">TODO</span> Comments</h3>
+
+
+<h3><span class="TODO TODO-TODO">TODO</span> Horizontal Rules</h3>
+
+
+<h3><span class="TODO TODO-TODO">TODO</span> captions</h3>
+
+
+<h3><span class="TODO TODO-TODO">TODO</span> dates</h3>
+<p>
+Note: the TODO state change lines are not indented!
+</p>
+
+<h2>Markup parsing [85%]</h2>
+
+<h3><span class="TODO TODO-DONE">DONE</span> bold</h3>
+
+
+<h3><span class="TODO TODO-DONE">DONE</span> underline</h3>
+
+
+<h3><span class="TODO TODO-DONE">DONE</span> italic</h3>
+
+
+<h3><span class="TODO TODO-DONE">DONE</span> link</h3>
+
+
+<h3><span class="TODO TODO-DONE">DONE</span> link target</h3>
+
+
+<h3><span class="TODO TODO-DONE">DONE</span> radio target</h3>
+
+
+<h3><span class="TODO TODO-TODO">TODO</span> radio target references</h3>
+
+
+<h1>Alternatives</h1>
+
+<h2>Parsing</h2>
+<ul>
+<li><a href="https://hackage.haskell.org/package/org-mode">org-mode</a>
+<ul>
+<li>list items can only be <b><i>simple text</i></b>.</li>
+<li>not responsive to github engagement</li>
+<li>supports output as minimal org source, but no pretty-printing</li>
+</ul></li>
+<li><a href="https://hackage.haskell.org/package/org-parser">org-parser</a>
+<ol>
+<li>May be <b>more</b> complete than this library.</li>
+<li>Uses a templating system (ondim) for pretty-printing (exporting)
+to different formats.</li>
+</ol></li>
+<li><a href="https://hackage.haskell.org/package/orgmode">orgmode</a>
+<ul>
+<li>built on Parsec library</li>
+</ul></li>
+<li><a href="https://hackage.haskell.org/package/orgmode-parse">orgmode-parse</a>
+<ul>
+<li>built on Attoparsec</li>
+<li>no markup or block support</li>
+<li>no <u>pretty-printing</u></li>
+</ul></li>
+</ul>
