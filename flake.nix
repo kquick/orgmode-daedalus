@@ -35,6 +35,16 @@
       url = "github:mesabloo/diagnose";
       flake = false;
     };
+    kvitable = {
+      url = "github:kquick/kvitable";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.levers.follows = "levers";
+      inputs.microlens-src.follows = "microlens-src";
+      inputs.named-text.follows = "named-text";
+      inputs.parameterized-utils-src.follows = "parameterized-utils-src";
+      inputs.sayable.follows = "sayable";
+      inputs.tasty-checklist.follows = "tasty-checklist";
+    };
     language-rust-src = {
       url = "github:GaloisInc/language-rust";
       flake = false;
@@ -53,13 +63,6 @@
       inputs.tasty-checklist.follows = "tasty-checklist";
     };
     parameterized-utils-src = {
-      # Lock to revision 6cd1f32 because the subsequent changes replace lens with
-      # microlens-pro, and the latter was only introduced in Feb 2024 (circa GHC
-      # 9.8.3), so it's not available for older nixpkgs configurations.  As of
-      # 2025 Dec, there are no functional changes in parameterized-utils, just
-      # dependency changes, and there is intent to remove the microlens-pro
-      # dependency from parameterized-utils, so freeze this until that occurs.
-      # url = "github:GaloisInc/parameterized-utils/6cd1f32";
       url = "github:GaloisInc/parameterized-utils";
       flake = false;
     };
@@ -72,7 +75,19 @@
       url = "github:kquick/tasty-checklist";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.levers.follows = "levers";
+      inputs.microlens-src.follows = "microlens-src";
       inputs.parameterized-utils-src.follows = "parameterized-utils-src";
+    };
+    tasty-sugar = {
+      url = "github:kquick/tasty-sugar";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.levers.follows = "levers";
+      inputs.microlens-src.follows = "microlens-src";
+      inputs.named-text.follows = "named-text";
+      inputs.kvitable.follows = "kvitable";
+      inputs.parameterized-utils-src.follows = "parameterized-utils-src";
+      inputs.sayable.follows = "sayable";
+      inputs.tasty-checklist.follows = "tasty-checklist";
     };
   };
 
@@ -81,12 +96,14 @@
             , bv-sized-src
             , daedalus-src
             , diagnose-src
+            , kvitable
             , language-rust-src
             , microlens-src
             , named-text
             , parameterized-utils-src
             , sayable
             , tasty-checklist
+            , tasty-sugar
             }:
     rec
       {
@@ -165,6 +182,7 @@
                   rts-vm-hs
                   sayable
                   tasty-checklist
+                  tasty-sugar
                 ;
               };
             });
