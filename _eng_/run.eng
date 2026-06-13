@@ -14,6 +14,7 @@ dev =
         in dir = {TopDir}
         notes =
            * GHC 9.12 still waiting for th-desugar 1.18 in nixpkgs
+           * GHC 9.14 wait on alex-tools lifting bounds: base, template-haskell
         exec = nix build --no-link .#orgmode-daedalus.ghc910
 
     nixbuild:old
