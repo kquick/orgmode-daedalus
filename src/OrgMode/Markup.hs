@@ -33,6 +33,7 @@ import           Panic
 --              | OrgText_bold [OrgText]
 --              | OrgText_italics [OrgText]
 --              | OrgText_underline [OrgText]
+--              ...
 --
 -- Note that each OrgText_text specifies a number of lines, but the boundaries
 -- between OrgText are *not* a line-break.
@@ -88,6 +89,7 @@ orgMarkupParse = detectMarkup . joined . toLists
 --              | OrgText_bold [OrgText]
 --              | OrgText_italics [OrgText]
 --              | OrgText_underline [OrgText]
+--              ...
 --
 -- Note that each OrgText_text specifies a number of lines, but the boundaries
 -- between OrgText are *not* a line-break.
@@ -299,7 +301,7 @@ detectMarkup =
              panic OrgMarkup "removeEndMarkup - Just Nothing"
              [ "Last element should have been the markup closure." ]
 
-    markupChars = "*_/~" :: String
+    markupChars = "*_/~=+" :: String
     endPunctuation = "!,.;'\")]:" :: String
 
 data MarkupContext = NoMarkup | Markup Text | Link
@@ -320,6 +322,8 @@ data OrgText' t = OrgText_text [[t]]
                 | OrgText_bold [OrgText' t]
                 | OrgText_italics [OrgText' t]
                 | OrgText_underline [OrgText' t]
+                | OrgText_verbatim [OrgText' t]
+                | OrgText_strikethrough [OrgText' t]
                 | OrgText_link Text (Maybe [OrgText' t])
                   -- ^ the link and optional description
                 | OrgText_link_target Text
@@ -339,6 +343,8 @@ displayLength =
     OrgText_bold ot -> maximum (displayLength <$> ot)
     OrgText_italics ot -> maximum (displayLength <$> ot)
     OrgText_underline ot -> maximum (displayLength <$> ot)
+    OrgText_verbatim ot -> maximum (displayLength <$> ot)
+    OrgText_strikethrough ot -> maximum (displayLength <$> ot)
     OrgText_link l mbd -> maybe (T.length l) (maximum . fmap displayLength) mbd
     OrgText_link_target _ -> 0
     OrgText_radio_target ot -> maximum (displayLength <$> ot)
@@ -356,6 +362,8 @@ displayLength' =
     OrgText_bold ot -> maximum (displayLength' <$> ot)
     OrgText_italics ot -> maximum (displayLength' <$> ot)
     OrgText_underline ot -> maximum (displayLength' <$> ot)
+    OrgText_verbatim ot -> maximum (displayLength' <$> ot)
+    OrgText_strikethrough ot -> maximum (displayLength' <$> ot)
     OrgText_link l mbd -> maybe (T.length l) (maximum . fmap displayLength') mbd
     OrgText_link_target _ -> 0
     OrgText_radio_target ot -> maximum (displayLength' <$> ot)

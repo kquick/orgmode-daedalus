@@ -89,5 +89,7 @@ instance LinkCollector OrgText where
     OrgText_bold od -> foldl collectLinks ls od
     OrgText_italics od -> foldl collectLinks ls od
     OrgText_underline od -> foldl collectLinks ls od
+    OrgText_verbatim od -> foldl collectLinks ls od
+    OrgText_strikethrough od -> foldl collectLinks ls od
     OrgText_link_target {} -> ls
     OrgText_radio_target od -> foldl collectLinks ls od
