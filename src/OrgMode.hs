@@ -9,6 +9,7 @@ module OrgMode
   , OrgBody(..)
   , OrgPara
   , OrgText'(..), OrgText
+  , OrgLink(..)
   , ListItem(..)
   , Drawer(..)
   , Block(..)

@@ -82,7 +82,7 @@ instance LinkCollector ListItem where
 
 instance LinkCollector OrgText where
   collectLinks ls = \case
-    OrgText_link l d -> (l,d) : ls
+    OrgText_link lnk -> collectLinks ls lnk
     OrgText_text {} -> ls
     OrgText_adj {} -> ls
     OrgText_code {} -> ls
@@ -93,3 +93,6 @@ instance LinkCollector OrgText where
     OrgText_strikethrough od -> foldl collectLinks ls od
     OrgText_link_target {} -> ls
     OrgText_radio_target od -> foldl collectLinks ls od
+
+instance LinkCollector (OrgLink T.Text) where
+  collectLinks ls (OrgLink l d) = (l, d) : ls

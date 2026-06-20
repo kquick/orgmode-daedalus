@@ -241,8 +241,7 @@ instance Sayable "html" OrgText where
     in \case
       OrgText_text txt -> toLines txt
       OrgText_adj txt -> toLines txt
-      OrgText_link l Nothing -> "<a href=\"" &+ l &+ "\">" &+ l &+ "</a>"
-      OrgText_link l (Just d) -> "<a href=\"" &+ l &+ "\">" &+ d &+ "</a>"
+      OrgText_link lnk -> sayable @"html" lnk
       OrgText_code ls -> hspan "code" (toLines ls)
       OrgText_bold e -> "<b>" &+ e &+ "</b>"
       OrgText_italics e -> "<i>" &+ e &+ "</i>"
@@ -257,6 +256,13 @@ instance Sayable "html" OrgText where
       --                    &< toLines ls
       --                    &< "</pre>"
       --                    &< "</div>"
+
+instance Sayable "html" [OrgText' t] => Sayable "html" (OrgLink t) where
+  sayable (OrgLink l d) =
+    case d of
+      Nothing -> "<a href=\"" &+ l &+ "\">" &+ l &+ "</a>"
+      Just t  -> "<a href=\"" &+ l &+ "\">" &+ t &+ "</a>"
+
 
 hspan :: Sayable "html" n => String -> n -> Saying "html"
 hspan c t = "<span class=\"" &+ c &+ "\">" &+ t &+ "</span>"

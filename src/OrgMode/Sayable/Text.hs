@@ -221,10 +221,7 @@ instance Sayable "text" OrgText where
     in \case
       OrgText_text txt -> toLines txt
       OrgText_adj txt -> toLines txt
-      OrgText_link l mbd ->
-        case mbd of
-          Just d -> sayable @"text" d &- '(' &+ PP.annotate #link &! l &+ ')'
-          Nothing -> PP.annotate #link &! sayable @"text" l
+      OrgText_link lnk -> sayable @"text" lnk
       OrgText_code tl -> '`' &+ PP.annotate #code &! toLines tl &+ '\''
       OrgText_bold e -> PP.annotate #bold &! e
       OrgText_italics e -> PP.annotate #italics &! e
@@ -233,3 +230,9 @@ instance Sayable "text" OrgText where
       OrgText_strikethrough _ -> sayable @"text" "" -- don't show this
       OrgText_link_target _ -> sayable @"text" "" -- nothing to show
       OrgText_radio_target t -> sayable @"text" t -- target ignored for now
+
+instance Sayable "text" [OrgText' t] => Sayable "text" (OrgLink t) where
+  sayable (OrgLink l mbd) =
+    case mbd of
+      Just d -> sayable @"text" d &- '(' &+ PP.annotate #link &! l &+ ')'
+      Nothing -> PP.annotate #link &! sayable @"text" l

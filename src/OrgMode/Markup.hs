@@ -1,7 +1,10 @@
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE DeriveFunctor #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE UndecidableInstances #-}
 
 module OrgMode.Markup
   (
@@ -9,8 +12,8 @@ module OrgMode.Markup
   , orgMarkupParseLine
   , OrgText'(..), OrgText
   , OrgPara
+  , OrgLink(..)
   , displayLength
-  , displayLength'
   )
 where
 
@@ -138,12 +141,12 @@ detectMarkup =
                            -- lw is Text, d is [Text], |d| is 1
                            ((NoMarkup, (newAcc, newAdj))
                            , OrgText_link
-                             (T.drop 2 lw)
-                             (Just (detectMarkup (Just . T.dropEnd 2 <$> d)))
+                             (OrgLink (T.drop 2 lw)
+                              (Just (detectMarkup (Just . T.dropEnd 2 <$> d))))
                              : acc)
                          _ ->
                            ((NoMarkup, (newAcc, newAdj))
-                           , OrgText_link wtp Nothing : acc)
+                           , OrgText_link (OrgLink wtp Nothing) : acc)
                      else
                            ((Link, (addToCurr w newAcc, newAdj)), acc)
                 _ ->
@@ -226,7 +229,7 @@ detectMarkup =
                    ) : acc
                   , newAccAdj)
            Link ->
-             let mkLink l d = OrgText_link (T.drop 2 l) d : acc
+             let mkLink l d = OrgText_link (OrgLink (T.drop 2 l) d) : acc
              in case L.uncons $ L.reverse t of
                   Just (Just w1, ws) ->
                     case L.uncons $ T.splitOn "][" w1 of
@@ -326,7 +329,7 @@ data OrgText' t = OrgText_text [[t]]
                 | OrgText_underline [OrgText' t]
                 | OrgText_verbatim [OrgText' t]
                 | OrgText_strikethrough [OrgText' t]
-                | OrgText_link Text (Maybe [OrgText' t])
+                | OrgText_link (OrgLink t)
                   -- ^ the link and optional description
                 | OrgText_link_target Text
                 | OrgText_radio_target [OrgText' t]
@@ -334,41 +337,40 @@ data OrgText' t = OrgText_text [[t]]
 
 type OrgText = OrgText' Text
 
-displayLength :: OrgText -> Int
-displayLength =
-  let maxLineLength = let wlen wrds = sum (fmap T.length wrds) + length wrds - 1
-                      in maximum . fmap wlen
-  in \case
-    OrgText_text txtLines -> maxLineLength txtLines
-    OrgText_adj txtLines -> maxLineLength txtLines
-    OrgText_code codeLines -> maxLineLength codeLines
-    OrgText_bold ot -> maximum (displayLength <$> ot)
-    OrgText_italics ot -> maximum (displayLength <$> ot)
-    OrgText_underline ot -> maximum (displayLength <$> ot)
-    OrgText_verbatim ot -> maximum (displayLength <$> ot)
-    OrgText_strikethrough ot -> maximum (displayLength <$> ot)
-    OrgText_link l mbd -> maybe (T.length l) (maximum . fmap displayLength) mbd
-    OrgText_link_target _ -> 0
-    OrgText_radio_target ot -> maximum (displayLength <$> ot)
+data OrgLink t = OrgLink Text (Maybe [OrgText' t])
+  deriving (Eq, Show, Functor)
 
-displayLength' :: Foldable t => OrgText' (t a) -> Int
-displayLength' =
-  let maxLineLength = let wlen wrds = sum (fmap F.length wrds) + length wrds - 1
-                      in maximum . fmap wlen
-  in \case
-    OrgText_text txtLines -> maxLineLength txtLines
-    OrgText_adj txtLines -> maxLineLength txtLines
-    OrgText_code codeLines ->
-      let wlen wrds = sum (fmap T.length wrds) + length wrds - 1
-      in maximum $ fmap wlen codeLines
-    OrgText_bold ot -> maximum (displayLength' <$> ot)
-    OrgText_italics ot -> maximum (displayLength' <$> ot)
-    OrgText_underline ot -> maximum (displayLength' <$> ot)
-    OrgText_verbatim ot -> maximum (displayLength' <$> ot)
-    OrgText_strikethrough ot -> maximum (displayLength' <$> ot)
-    OrgText_link l mbd -> maybe (T.length l) (maximum . fmap displayLength') mbd
-    OrgText_link_target _ -> 0
-    OrgText_radio_target ot -> maximum (displayLength' <$> ot)
+
+class DisplayLength a where
+  displayLength :: a -> Int
+
+instance ( DisplayLength [t]
+         , DisplayLength t
+         ) => DisplayLength (OrgText' t) where
+  displayLength = \case
+      OrgText_text txtLines -> maximum (displayLength <$> txtLines)
+      OrgText_adj txtLines -> maximum (displayLength <$> txtLines)
+      OrgText_code codeLines -> maximum (displayLength <$> codeLines)
+      OrgText_bold ot -> maximum (displayLength <$> ot)
+      OrgText_italics ot -> maximum (displayLength <$> ot)
+      OrgText_underline ot -> maximum (displayLength <$> ot)
+      OrgText_verbatim ot -> maximum (displayLength <$> ot)
+      OrgText_strikethrough ot -> maximum (displayLength <$> ot)
+      OrgText_link lnk -> displayLength lnk
+      OrgText_link_target _ -> 0
+      OrgText_radio_target ot -> maximum (displayLength <$> ot)
+
+instance DisplayLength t => DisplayLength [t] where
+  displayLength wrds = sum (fmap displayLength wrds) + length wrds - 1
+
+instance {-# OVERLAPPING #-} DisplayLength Text where
+  displayLength = T.length
+instance {-# OVERLAPPABLE #-} Foldable t => DisplayLength (t a) where
+  displayLength = F.length
+
+instance DisplayLength a => DisplayLength (OrgLink a) where
+  displayLength (OrgLink l mbd) =
+    maybe (T.length l) (maximum . fmap displayLength) mbd
 
 
 ----------------------------------------------------------------------

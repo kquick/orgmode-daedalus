@@ -1721,7 +1721,7 @@ testOrgMode = testSpec "OrgMode" $ do
         (fmap orgMarkupParse . getPara <=< getBodyIdx 0)
         (Just [ OrgText_text [ ["I", "am", "going", "to", "give"]
                              , ["you", "a"]]
-              , OrgText_link "link" Nothing
+              , OrgText_link (OrgLink "link" Nothing)
               , OrgText_text [["to", "use."]]
               ])
        :> Val "num sections" (F.length . DV.toList . getField @"sections") 0
@@ -1744,9 +1744,10 @@ testOrgMode = testSpec "OrgMode" $ do
                                      , OrgText_text [["to"]]]
               , OrgText_text [ [ "give"]
                              , ["you", "a"]]
-              , OrgText_link "a_link"
-                (Just [OrgText_italics [OrgText_text [["hopefully"]]]
-                      , OrgText_text [["useful", "Link"]]])
+              , OrgText_link
+                (OrgLink "a_link"
+                 (Just [OrgText_italics [OrgText_text [["hopefully"]]]
+                       , OrgText_text [["useful", "Link"]]]))
               , OrgText_text [["to"]]
               , OrgText_link_target "use"
               , OrgText_adj [[";", "here."]]
@@ -1783,11 +1784,11 @@ testOrgMode = testSpec "OrgMode" $ do
          (fmap toLine [ "A [[a_link][Link]] here." ]))
        :> Val "main body with markup"
         (fmap orgMarkupParse . getPara <=< getBodyIdx 0)
-        (Just [ OrgText_text [ ["A"] ]
-              , OrgText_link "a_link"
-                (Just [ OrgText_text [["Link"]] ])
-              , OrgText_text [["here."]]
-              ])
+        (Just
+         [ OrgText_text [ ["A"] ]
+         , OrgText_link $ OrgLink "a_link" $ Just [ OrgText_text [["Link"]] ]
+         , OrgText_text [["here."]]
+         ])
        :> Val "num sections" (F.length . DV.toList . getField @"sections") 0
       )
 

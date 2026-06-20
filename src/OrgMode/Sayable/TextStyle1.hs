@@ -350,10 +350,7 @@ instance Sayable "text-style1" (SectionLevel OrgText) where
     in case ot of
          OrgText_text txt -> toLines txt
          OrgText_adj txt -> toLines txt
-         OrgText_link l mbd ->
-           case mbd of
-             Just d -> '[' &+ sayable @"text-style1" d &+ ']'
-             Nothing -> PP.annotate #link &! sayable @"text-style1" l
+         OrgText_link lnk -> sayable @"text-style1" lnk
          OrgText_code tl -> '`' &+ PP.annotate #code &! toLines tl &+ '\''
          OrgText_bold e -> PP.annotate #bold &! ('*' &+ SectionLvl n e &+ '*')
          OrgText_italics e -> PP.annotate #italics
@@ -366,3 +363,9 @@ instance Sayable "text-style1" (SectionLevel OrgText) where
                                     &! ('+' &+ SectionLvl n e &+ '+')
          OrgText_link_target _ -> sayable @"text-style1" "" -- nothing to show
          OrgText_radio_target t -> sayable @"text-style1" t -- target ignored for now
+
+instance Sayable "text-style1" [OrgText' t] => Sayable "text-style1" (OrgLink t) where
+  sayable (OrgLink l mbd) =
+    case mbd of
+      Just d -> '[' &+ sayable @"text-style1" d &+ ']'
+      Nothing -> PP.annotate #link &! sayable @"text-style1" l
