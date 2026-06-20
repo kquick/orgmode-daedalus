@@ -1,4 +1,9 @@
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE DeriveFoldable #-}
+{-# LANGUAGE DeriveTraversable #-}
+{-# LANGUAGE KindSignatures #-}
+{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE TypeFamilies #-}
 {-# LANGUAGE DeriveFunctor #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
@@ -14,6 +19,8 @@ module OrgMode.Markup
   , OrgPara
   , OrgLink(..)
   , displayLength
+  , OrgText'F(..)
+  , OrgLinkF(..)
   )
 where
 
@@ -21,6 +28,8 @@ import           Daedalus.RTS
 import qualified Daedalus.RTS.Vector as DV
 import           Data.Bool ( bool )
 import qualified Data.Foldable as F
+import           Data.Functor.Foldable
+import           Data.Functor.Foldable.TH ( makeBaseFunctor )
 import qualified Data.List as L
 import           Data.Maybe ( catMaybes, isJust )
 import           Data.Text ( Text )
@@ -340,6 +349,19 @@ type OrgText = OrgText' Text
 data OrgLink t = OrgLink Text (Maybe [OrgText' t])
   deriving (Eq, Show, Functor)
 
+----------------------------------------------------------------------
+
+data OrgMarkup = OrgMarkup
+
+instance PanicComponent OrgMarkup where
+  panicComponentName _ = "orgMarkupParse"
+  panicComponentIssues _ = "kq1quick@gmail.com"
+  panicComponentRevision _ = ("TBD", "")
+
+
+makeBaseFunctor ''OrgLink
+makeBaseFunctor ''OrgText'
+
 
 class DisplayLength a where
   displayLength :: a -> Int
@@ -347,18 +369,18 @@ class DisplayLength a where
 instance ( DisplayLength [t]
          , DisplayLength t
          ) => DisplayLength (OrgText' t) where
-  displayLength = \case
-      OrgText_text txtLines -> maximum (displayLength <$> txtLines)
-      OrgText_adj txtLines -> maximum (displayLength <$> txtLines)
-      OrgText_code codeLines -> maximum (displayLength <$> codeLines)
-      OrgText_bold ot -> maximum (displayLength <$> ot)
-      OrgText_italics ot -> maximum (displayLength <$> ot)
-      OrgText_underline ot -> maximum (displayLength <$> ot)
-      OrgText_verbatim ot -> maximum (displayLength <$> ot)
-      OrgText_strikethrough ot -> maximum (displayLength <$> ot)
-      OrgText_link lnk -> displayLength lnk
-      OrgText_link_target _ -> 0
-      OrgText_radio_target ot -> maximum (displayLength <$> ot)
+  displayLength = cata $ \case
+      OrgText_textF txtLines -> maximum (displayLength <$> txtLines)
+      OrgText_adjF txtLines -> maximum (displayLength <$> txtLines)
+      OrgText_codeF codeLines -> maximum (displayLength <$> codeLines)
+      OrgText_boldF l -> maximum l
+      OrgText_italicsF l -> maximum l
+      OrgText_underlineF l -> maximum l
+      OrgText_verbatimF l -> maximum l
+      OrgText_strikethroughF l -> maximum l
+      OrgText_linkF lnk -> displayLength lnk
+      OrgText_link_targetF _ -> 0
+      OrgText_radio_targetF l -> maximum l
 
 instance DisplayLength t => DisplayLength [t] where
   displayLength wrds = sum (fmap displayLength wrds) + length wrds - 1
@@ -371,13 +393,3 @@ instance {-# OVERLAPPABLE #-} Foldable t => DisplayLength (t a) where
 instance DisplayLength a => DisplayLength (OrgLink a) where
   displayLength (OrgLink l mbd) =
     maybe (T.length l) (maximum . fmap displayLength) mbd
-
-
-----------------------------------------------------------------------
-
-data OrgMarkup = OrgMarkup
-
-instance PanicComponent OrgMarkup where
-  panicComponentName _ = "orgMarkupParse"
-  panicComponentIssues _ = "kq1quick@gmail.com"
-  panicComponentRevision _ = ("TBD", "")

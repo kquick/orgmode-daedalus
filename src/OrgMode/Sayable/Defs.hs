@@ -30,6 +30,7 @@ where
 import           Daedalus.RTS
 import qualified Daedalus.RTS.Vector as DV
 import           Data.Char ( isSpace )
+import Data.Functor.Foldable
 import qualified Data.List as L
 import qualified Data.Text as T
 import           GHC.Records ( getField )
@@ -60,7 +61,8 @@ stripLeadingWhitespace = go . filter (not . all isSpace . DV.vecToString)
     stripWord = DV.fromList . L.dropWhile (== lit 32) . DV.toList
 
 class LinkCollector a where
-  collectLinks :: [(T.Text, Maybe [OrgText])] -> a
+  collectLinks :: [(T.Text, Maybe [OrgText])]
+               -> a
                -> [(T.Text, Maybe [OrgText])]
 
 instance LinkCollector OrgBody where
@@ -81,18 +83,20 @@ instance LinkCollector ListItem where
     in foldl collectLinks el $ DV.toList $ getField @"more" li
 
 instance LinkCollector OrgText where
-  collectLinks ls = \case
-    OrgText_link lnk -> collectLinks ls lnk
-    OrgText_text {} -> ls
-    OrgText_adj {} -> ls
-    OrgText_code {} -> ls
-    OrgText_bold od -> foldl collectLinks ls od
-    OrgText_italics od -> foldl collectLinks ls od
-    OrgText_underline od -> foldl collectLinks ls od
-    OrgText_verbatim od -> foldl collectLinks ls od
-    OrgText_strikethrough od -> foldl collectLinks ls od
-    OrgText_link_target {} -> ls
-    OrgText_radio_target od -> foldl collectLinks ls od
+  collectLinks ls = (<> ls) . cata go
+    where
+      go = \case
+        OrgText_linkF lnk -> collectLinks mempty lnk
+        OrgText_textF {} -> []
+        OrgText_adjF {} -> []
+        OrgText_codeF {} -> []
+        OrgText_boldF od -> concat od
+        OrgText_italicsF od -> concat od
+        OrgText_underlineF od -> concat od
+        OrgText_verbatimF od -> concat od
+        OrgText_strikethroughF od -> concat od
+        OrgText_link_targetF {} -> []
+        OrgText_radio_targetF od -> concat od
 
 instance LinkCollector (OrgLink T.Text) where
   collectLinks ls (OrgLink l d) = (l, d) : ls
