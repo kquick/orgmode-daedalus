@@ -1,4 +1,4 @@
-name: kvitable CI
+name: orgmode-daedalus CI
 on:
   push:
     branches:
