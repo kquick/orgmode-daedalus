@@ -81,8 +81,8 @@ instance
                   len = fromInteger $ asInt $ getField @"level" s
                   bdy = DV.toList $ getField @"body" s
                   tdo = addTodoAnn . DV.vecToString <$> getField @"todo" s
-                  addTodoAnn "TODO" = PP.annotate #TODO &! "TODO"
-                  addTodoAnn "DONE" = PP.annotate #DONE &! "DONE"
+                  addTodoAnn "TODO" = PP.annotate #todo &! "TODO"
+                  addTodoAnn "DONE" = PP.annotate #done &! "DONE"
                   addTodoAnn o = PP.annotate #todo &! o
                   sline = T.replicate len (T.singleton '*') &? tdo &- hdr
               in sline &< (if L.null bdy

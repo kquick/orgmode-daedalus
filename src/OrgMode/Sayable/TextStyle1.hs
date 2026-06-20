@@ -130,8 +130,8 @@ instance
   ) => Sayable "text-style1" (SectionLevel OrgSection) where
   sayable (SectionLvl ls s) =
     let tdo = addTodoAnn . DV.vecToString <$> getField @"todo" s
-        addTodoAnn "TODO" = PP.annotate #TODO &! "TODO"
-        addTodoAnn "DONE" = PP.annotate #DONE &! "DONE"
+        addTodoAnn "TODO" = PP.annotate #todo &! "TODO"
+        addTodoAnn "DONE" = PP.annotate #done &! "DONE"
         addTodoAnn o = PP.annotate #todo &! o
         hdr = let h = orgMarkupParseLine $ getField @"header" s
                   sn = sez @"text-style1" $ '.' &:* (L.reverse ls)
