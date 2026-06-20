@@ -85,6 +85,8 @@ The End
 *** DONE link
 *** DONE link target
 *** DONE radio target
+*** DONE strikethrough
+*** DONE verbatim
 *** TODO radio target references
 
 * Alternatives
@@ -102,7 +104,7 @@ The End
    - [[https://hackage.haskell.org/package/orgmode][orgmode]]
      + built on Parsec library
    - [[https://hackage.haskell.org/package/orgmode-parse][orgmode-parse]]
-     + built on Attoparsec
-     + no markup or block support
+     + built on =Attoparsec=
+     + no +normal,+ markup or block support
      + no _pretty-printing_
 

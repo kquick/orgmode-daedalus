@@ -135,6 +135,12 @@ Note: the TODO state change lines are not indented!
 <h3><span class="TODO TODO-DONE">DONE</span> radio target</h3>
 
 
+<h3><span class="TODO TODO-DONE">DONE</span> strikethrough</h3>
+
+
+<h3><span class="TODO TODO-DONE">DONE</span> verbatim</h3>
+
+
 <h3><span class="TODO TODO-TODO">TODO</span> radio target references</h3>
 
 
@@ -160,8 +166,8 @@ to different formats.</li>
 </ul></li>
 <li><a href="https://hackage.haskell.org/package/orgmode-parse">orgmode-parse</a>
 <ul>
-<li>built on Attoparsec</li>
-<li>no markup or block support</li>
+<li>built on <code>Attoparsec</code></li>
+<li>no <s>normal,</s> markup or block support</li>
 <li>no <u>pretty-printing</u></li>
 </ul></li>
 </ul>

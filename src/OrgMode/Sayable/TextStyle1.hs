@@ -356,6 +356,13 @@ instance Sayable "text-style1" (SectionLevel OrgText) where
              Nothing -> PP.annotate #link &! sayable @"text-style1" l
          OrgText_code tl -> '`' &+ PP.annotate #code &! toLines tl &+ '\''
          OrgText_bold e -> PP.annotate #bold &! ('*' &+ SectionLvl n e &+ '*')
-         OrgText_italics e -> PP.annotate #italics &! ('/' &+ SectionLvl n e &+ '/')
-         OrgText_underline e -> PP.annotate #underline &! ('_' &+ SectionLvl n e &+ '_')
-         o -> error $ "Sayable OrgText: " <> show o
+         OrgText_italics e -> PP.annotate #italics
+                              &! ('/' &+ SectionLvl n e &+ '/')
+         OrgText_underline e -> PP.annotate #underline
+                                &! ('_' &+ SectionLvl n e &+ '_')
+         OrgText_verbatim e -> PP.annotate #verbatim
+                               &! ('`' &+ SectionLvl n e &+ "'")
+         OrgText_strikethrough e -> PP.annotate #strikethrough
+                                    &! ('+' &+ SectionLvl n e &+ '+')
+         OrgText_link_target _ -> sayable @"text-style1" "" -- nothing to show
+         OrgText_radio_target t -> sayable @"text-style1" t -- target ignored for now

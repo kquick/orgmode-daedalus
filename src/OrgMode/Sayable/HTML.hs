@@ -247,7 +247,7 @@ instance Sayable "html" OrgText where
       OrgText_bold e -> "<b>" &+ e &+ "</b>"
       OrgText_italics e -> "<i>" &+ e &+ "</i>"
       OrgText_underline e -> "<u>" &+ e &+ "</u>"
-      OrgText_verbatim e -> "<pre>" &+ e &+ "</pre>"
+      OrgText_verbatim e -> "<code>" &+ e &+ "</code>"
       OrgText_strikethrough e -> "<s>" &+ e &+ "</s>"
       OrgText_link_target _ -> blank
       OrgText_radio_target t -> sayable @"html" t

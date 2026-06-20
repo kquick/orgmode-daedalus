@@ -139,6 +139,12 @@
 *** DONE radio target
 
 
+*** DONE strikethrough
+
+
+*** DONE verbatim
+
+
 *** TODO radio target references
 
 
@@ -169,7 +175,7 @@
 
     + built on Attoparsec
 
-    + no markup or block support
+    + no  markup or block support
 
     + no pretty-printing
 

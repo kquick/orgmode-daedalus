@@ -217,6 +217,8 @@ detectMarkup =
                          "*" -> OrgText_bold t1m
                          "_" -> OrgText_underline t1m
                          "/" -> OrgText_italics t1m
+                         "=" -> OrgText_verbatim t1m
+                         "+" -> OrgText_strikethrough t1m
                          ">>" -> OrgText_link_target $ T.concat $ catMaybes t1
                          ">>>" -> OrgText_radio_target t1m
                          o -> panic OrgMarkup "markupConstr"
