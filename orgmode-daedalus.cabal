@@ -26,6 +26,12 @@ extra-source-files: ddl/org-mode.ddl
 
 common config
     ghc-options: -Wall
+                 -Wcompat
+                 -Wincomplete-uni-patterns
+                 -Wsimplifiable-class-constraints
+                 -Wpartial-fields
+                 -fhide-source-paths
+                 -O2
 
 library
     import:           config
