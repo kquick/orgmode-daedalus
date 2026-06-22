@@ -34,6 +34,49 @@ entirely within each individual structural element.
 *** DONE Blocks
 *** DONE Settings
 *** TODO Tables
+*** TODO Properties
+*** TODO Export Settings [26%]
+**** DONE AUTHOR
+**** TODO BIND
+**** TODO CREATOR
+**** TODO DATE
+**** DONE DESCRIPTION
+**** DONE EMAIL
+**** TODO EXCLUDE_TAGS
+**** TODO EXPORT_FILE_NAME
+**** TODO EXPORT_x
+**** TODO LANGUAGE
+**** TODO OPTIONS
+**** TODO SELECT_TAGS
+**** TODO SETUPFILE
+**** TODO SUBTITLE
+**** DONE TITLE
+**** ASCII-specific [20%]
+***** DONE Quoting ASCII text
+***** TODO section-to-list level
+***** TODO ATTR_ASCII
+***** TODO JUSTIFYLEFT
+***** TODO JUSTIFYRIGHT
+**** Latex-specific [0%]
+***** TODO LATEX_CLASS
+***** TODO LATEX_CLASS_OPTIONS
+***** TODO LATEX_COMPILER
+***** TODO LATEX_HEADER
+***** TODO LATEX_HEADER_EXTRA
+***** TODO LATEX_CLASS_PRE
+***** TODO KEYWORDS
+**** HTML-specific [27%]
+***** TODO HTML_DOCTYPE
+***** TODO HTML_CONTAINER
+***** TODO HTML_LINK_HOME
+***** TODO HTML_LINK_UP
+***** TODO HTML_MATHJAX
+***** DONE HTML_HEAD
+***** DONE HTML_HEAD_EXTRA
+***** TODO KEYWORDS
+***** DONE Quoting HTML tags
+***** TODO self-linked headlines
+***** TODO ATTR_HTML link
 *** TODO Footnotes
 *** TODO Comments
 *** TODO Horizontal Rules
@@ -44,6 +87,12 @@ entirely within each individual structural element.
 *** DONE bold
 *** DONE underline
 *** DONE italic
+*** DONE strikethrough
+*** DONE verbatim
+*** TODO superscripts
+*** TODO subscripts
+*** TODO special symbols
+*** TODO embedded LaTeX
 *** DONE link
 *** DONE link target
 *** DONE radio target

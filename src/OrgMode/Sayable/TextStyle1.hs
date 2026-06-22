@@ -33,6 +33,7 @@ where
 import           Data.Bool ( bool )
 import           Data.Char ( chr, toUpper )
 import qualified Data.List as L
+import           Data.Tagged
 import qualified Data.Text as T
 import           GHC.Records ( HasField, getField )
 import qualified Language.Haskell.TH as TH
@@ -77,7 +78,16 @@ instance ( $(sayableSubConstraints $ do ofType ''SectionLevel
          else SectionLvl mempty (getField @"body" od)
               &< ""
               &< SectionLvl mempty (getField @"sections" od)
+              &< ""
 
+
+
+centerLine :: Sayable "text-style1" a
+           => Tagged "width" Int -> a -> Saying "text-style1"
+centerLine tw a =
+  let l = sez @"text-style1" a
+      pfxlen = max 0 $ (unTagged tw - length l) `div` 2
+  in replicate pfxlen ' ' &+ l
 
 ----------------------------------------------------------------------
 
@@ -92,7 +102,18 @@ instance ( Sayable "text-style1" (SectionLevel OrgBody)
                                         paramTH (TH.ConT ''OrgBody))
          ) => Sayable "text-style1" (SectionLevel (DV.Vector OrgBody)) where
   sayable (SectionLvl ls obs) =
-    foldlNES @"text-style1" withBlankLine (SectionLvl ls <$> DV.toList obs)
+    let joinLines a b =
+          case b of
+            SectionLvl _ (OrgBody_setting setting) ->
+              -- n.b. since some settings are not applied, break the newline
+              -- general rule and be explicit here when appropriate.
+              let kw = fmap toUpper $ DV.vecToString $ getField @"keyword" setting
+              in if kw `elem` [ "TITLE", "AUTHOR", "EMAIL" ]
+                 then a &< b
+                 else a  -- drop b, it's probably blank (see Sayable OrgBody)
+            _ -> withBlankLine a b
+        showableBody = L.filter (not . isDrawer) $ DV.toList obs
+    in foldlNES @"text-style1" joinLines (SectionLvl ls <$> showableBody)
 
 
 ----------------------------------------------------------------------
@@ -155,7 +176,10 @@ instance
           case mbd of
             Nothing -> a  -- already shown inline
             Just d -> a &< "" &< '[' &+ d &+ "] <" &+ l &+ '>'
-        noBody = L.null $ DV.toList $ getField @"body" s
+        noBody = L.null
+                 $ L.filter (not . isDrawer)
+                 $ DV.toList
+                 $ getField @"body" s
         noSubs = L.null $ DV.toList $ getField @"sections" s
     in hdr &< (if noBody
                then if noSubs
@@ -185,7 +209,19 @@ instance ( Sayable "text-style1" OrgBody
       OrgBody_enumList l -> (PP.align &! SectionLvl n (EnumList l))
       OrgBody_splatList l -> (PP.align &! SectionLvl n (BulletList '*' l))
       OrgBody_aBlock b -> sayable @"text-style1" b
-      _ -> sayable @"text-style1" $ show ob
+      OrgBody_drawer {} -> blank
+      OrgBody_setting setting ->
+        case fmap toUpper $ DV.vecToString $ getField @"keyword" setting of
+          "AUTHOR" -> centerLine 70
+                      $ orgMarkupParseLine (getField @"values" setting)
+          "EMAIL" -> centerLine 70
+                     $ orgMarkupParseLine (getField @"values" setting)
+          "TITLE" -> let ttl = orgMarkupParseLine $ getField @"values" setting
+                         ttllen = displayLength ttl
+                     in centerLine 70 (replicate ttllen '━')
+                        &< centerLine 70 ttl
+                        &< centerLine 70 (replicate ttllen '━')
+          _ -> blank
 
 ----------------------------------------------------------------------
 
@@ -299,9 +335,7 @@ instance Sayable "text-style1" Block where
       code | (toUpper <$> code) == "VERSE" ->
         PP.indent 6 &! foldlNES (&<) (DV.toList $ getField @"contents" blk)
       code | (toUpper <$> code) == "CENTER" ->
-        let eachLine l = let l' = sez @"text-style1" l
-                             i = max 0 (35 - (length l' `div` 2 + 1))
-                         in L.replicate i ' ' &+ l
+        let eachLine l = centerLine 70 l
         in foldlNES (&<) (eachLine <$> DV.toList (getField @"contents" blk))
       _ ->
         foldlNES (&<) (DV.toList $ getField @"contents" blk)
@@ -361,8 +395,9 @@ instance Sayable "text-style1" (SectionLevel OrgText) where
                                &! ('`' &+ SectionLvl n e &+ "'")
          OrgText_strikethrough e -> PP.annotate #strikethrough
                                     &! ('+' &+ SectionLvl n e &+ '+')
-         OrgText_link_target _ -> sayable @"text-style1" "" -- nothing to show
+         OrgText_link_target _ -> blank
          OrgText_radio_target t -> sayable @"text-style1" t -- target ignored for now
+         OrgText_export kind ls -> bool blank (toLines ls) $ kind == T.pack "@ascii"
 
 instance Sayable "text-style1" [OrgText' t] => Sayable "text-style1" (OrgLink t) where
   sayable (OrgLink l mbd) =

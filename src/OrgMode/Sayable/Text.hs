@@ -30,6 +30,7 @@ module OrgMode.Sayable.Text
   )
 where
 
+import           Data.Bool ( bool )
 import           Data.Char ( chr, toUpper )
 import qualified Data.List as L
 import qualified Data.Text as T
@@ -64,7 +65,18 @@ instance ( $(sayableSubConstraints $ ofType ''OrgDoc >> tagSym "text")
 
 instance ( Sayable "text" OrgBody
          ) => Sayable "text" (DV.Vector OrgBody) where
-  sayable = foldlNES @"text" withBlankLine . DV.toList
+  sayable =
+    let joinLines a b =
+          case b of
+            OrgBody_setting setting ->
+              -- n.b. since some settings are not applied, break the newline
+              -- general rule and be explicit here when appropriate.
+              let kw = fmap toUpper $ DV.vecToString $ getField @"keyword" setting
+              in if kw `elem` [ "TITLE", "AUTHOR", "EMAIL" ]
+                 then a &< b
+                 else a  -- drop b, it's probably blank (see Sayable OrgBody)
+            _ -> withBlankLine a b
+    in foldlNES @"text" joinLines . filter (not . isDrawer) . DV.toList
 
 
 ----------------------------------------------------------------------
@@ -79,18 +91,18 @@ instance
   ) => Sayable "text" OrgSection where
   sayable s = let hdr = orgMarkupParseLine $ getField @"header" s
                   len = fromInteger $ asInt $ getField @"level" s
-                  bdy = DV.toList $ getField @"body" s
+                  bdy = getField @"body" s
                   tdo = addTodoAnn . DV.vecToString <$> getField @"todo" s
                   addTodoAnn "TODO" = PP.annotate #todo &! "TODO"
                   addTodoAnn "DONE" = PP.annotate #done &! "DONE"
                   addTodoAnn o = PP.annotate #todo &! o
                   sline = T.replicate len (T.singleton '*') &? tdo &- hdr
-              in sline &< (if L.null bdy
+              in sline &< (if L.null $ L.filter (not . isDrawer) $ DV.toList bdy
                            then if L.null $ DV.toList $ getField @"sections" s
                                 then blank
                                 else "" &< getField @"sections" s
                            else ""
-                                &< PP.indent 2 &! getField @"body" s
+                                &< PP.indent 2 &! bdy
                                 &< ""
                                 &< getField @"sections" s
                           )
@@ -107,9 +119,16 @@ instance ($(sayableSubConstraints $ ofType ''OrgBody >> tagSym "text")
     OrgBody_plusList l -> (PP.align &! BulletList '+' l)
     OrgBody_enumList l -> (PP.align &! EnumList l)
     OrgBody_splatList l -> (PP.align &! BulletList '*' l)
-    OrgBody_drawer {} -> "tbd drawer" &- '!'
+    OrgBody_drawer {} -> blank
     OrgBody_aBlock bls -> PP.indent 4 &! bls
-    OrgBody_setting {} -> "tbd setting" &- '!'
+    OrgBody_setting setting ->
+      case fmap toUpper $ DV.vecToString $ getField @"keyword" setting of
+        "AUTHOR" -> "  by" &- orgMarkupParseLine (getField @"values" setting)
+        "EMAIL" -> "    " &- orgMarkupParseLine (getField @"values" setting)
+        "TITLE" -> let ttl = orgMarkupParseLine $ getField @"values" setting
+                       ttllen = displayLength ttl
+                   in ttl &< replicate ttllen '='
+        _ -> blank
     OrgBody_paragraph p -> sayable @"text" $ orgMarkupParse p
 
 
@@ -221,15 +240,16 @@ instance Sayable "text" OrgText where
     in \case
       OrgText_text txt -> toLines txt
       OrgText_adj txt -> toLines txt
-      OrgText_link lnk -> sayable @"text" lnk
+      OrgText_link lnk -> sayable lnk
       OrgText_code tl -> '`' &+ PP.annotate #code &! toLines tl &+ '\''
       OrgText_bold e -> PP.annotate #bold &! e
       OrgText_italics e -> PP.annotate #italics &! e
       OrgText_underline e -> PP.annotate #underline &! e
       OrgText_verbatim e -> PP.annotate #verbatim &! e
-      OrgText_strikethrough _ -> sayable @"text" "" -- don't show this
-      OrgText_link_target _ -> sayable @"text" "" -- nothing to show
-      OrgText_radio_target t -> sayable @"text" t -- target ignored for now
+      OrgText_strikethrough _ -> blank -- don't show this
+      OrgText_link_target _ -> blank -- nothing to show
+      OrgText_radio_target t -> sayable t -- target ignored for now
+      OrgText_export kind ls -> bool blank (toLines ls) $ kind == T.pack "@ascii"
 
 instance Sayable "text" [OrgText' t] => Sayable "text" (OrgLink t) where
   sayable (OrgLink l mbd) =

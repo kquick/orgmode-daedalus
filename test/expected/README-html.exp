@@ -1,5 +1,21 @@
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>README Sample</title>
+<meta name="author" content="Kevin Quick, Someright 2026" />
+
+<meta name="description" content="README Sample for Testing" />
+<img src="images/some_logo.png" alt="sample logo" width="10%" style="inline" />
+<link rel="icon" sizes="32x32" href="images/some_logo.png"/>
+<link href="sample.css" rel="stylesheet" type="text/css"/>
+<link href="sample_readme.css" rel="stylesheet" type="text/css"/>
+
+
+
+</head>
+<body>
 
 <h1>orgmode-daedalus</h1>
+
 <p>
 A parser and pretty-printer for the <a href="https://orgmode.org">Org-Mode</a> document format.
 </p>
@@ -16,6 +32,7 @@ Development and usage is supported by the <a href="https://github.com/GaloisInc/
 </p>
 
 <h1>OrgMode support details</h1>
+
 <p>
 Note that structural and markup parsing are distinct operations: markup is parsed
 entirely within each individual structural element.
@@ -40,6 +57,7 @@ entirely within each individual structural element.
 
 
 <h3><span class="TODO TODO-DONE">DONE</span> lists</h3>
+
 <ul>
 <li>splat</li>
 <li>dash</li>
@@ -57,6 +75,7 @@ entirely within each individual structural element.
 
 
 <h3><span class="TODO TODO-DONE">DONE</span> Blocks</h3>
+
 <blockquote>
 <p>
     Don't be shy&hellip;
@@ -111,6 +130,7 @@ The End
 
 
 <h3><span class="TODO TODO-TODO">TODO</span> dates</h3>
+
 <p>
 Note: the TODO state change lines are not indented!
 </p>
@@ -147,6 +167,7 @@ Note: the TODO state change lines are not indented!
 <h1>Alternatives</h1>
 
 <h2>Parsing</h2>
+
 <ul>
 <li><a href="https://hackage.haskell.org/package/org-mode">org-mode</a>
 <ul>
@@ -171,3 +192,6 @@ to different formats.</li>
 <li>no <u>pretty-printing</u></li>
 </ul></li>
 </ul>
+
+</body>
+</html>

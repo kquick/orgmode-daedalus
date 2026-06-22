@@ -24,6 +24,8 @@ module OrgMode.Sayable.Defs
   , blank
   , withBlankLine
   , stripLeadingWhitespace
+  , isSetting
+  , isDrawer
   )
 where
 
@@ -59,6 +61,16 @@ stripLeadingWhitespace = go . filter (not . all isSpace . DV.vecToString)
   where
     go = fmap stripWord
     stripWord = DV.fromList . L.dropWhile (== lit 32) . DV.toList
+
+isDrawer :: OrgBody -> Bool
+isDrawer = \case
+  (OrgBody_drawer {}) -> True
+  _ -> False
+
+isSetting :: OrgBody -> Bool
+isSetting = \case
+  (OrgBody_setting {}) -> True
+  _ -> False
 
 class LinkCollector a where
   collectLinks :: [(T.Text, Maybe [OrgText])]
@@ -97,6 +109,7 @@ instance LinkCollector OrgText where
         OrgText_strikethroughF od -> concat od
         OrgText_link_targetF {} -> []
         OrgText_radio_targetF od -> concat od
+        OrgText_exportF {} -> []
 
 instance LinkCollector (OrgLink T.Text) where
   collectLinks ls (OrgLink l d) = (l, d) : ls

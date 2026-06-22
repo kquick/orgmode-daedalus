@@ -1,4 +1,24 @@
+#+TITLE: README Sample
+#+AUTHOR: Kevin Quick, Someright 2026
+#+EMAIL: Kevin Quick <kq1quick@gmail.com>
+#+DESCRIPTION: README Sample for Testing
+#+SETUPFILE: theme.setup
+#+HTML_HEAD: <img src="images/some_logo.png" alt="sample logo" width="10%" style="inline" /> 
+#+HTML_HEAD: <link rel="icon" sizes="32x32" href="images/some_logo.png"/>
+#+HTML_HEAD: <link href="sample.css" rel="stylesheet" type="text/css"/>
+#+HTML_HEAD: <link href="sample_readme.css" rel="stylesheet" type="text/css"/>
+#+LATEX_CLASS: sample
+#+LATEX_CLASS_OPTIONS: [a4paper]
+#+LATEX_HEADER: \doctype{User Guide}
+#+LATEX_HEADER: \docrev{1.1}{2025 Nov 05}
+#+LATEX_HEADER: \docid{README-02}
+#+OPTIONS: ^:nil auto-id:t
+#+PROPERTY: header-args :eval yes :exports both :cache no
+
 * orgmode-daedalus
+:PROPERTIES:
+:CUSTOM_ID: h:52d3eb6c-1236-42f7-bbd6-19a8e4587089
+:END:
 
    A parser and pretty-printer for the [[https://orgmode.org][Org-Mode]] document format.
 
@@ -13,18 +33,45 @@ Development and usage is supported by the [[https://github.com/GaloisInc/eng][en
 ~eng~ in this directory for more information.
 
 * OrgMode support details
+:PROPERTIES:
+:CUSTOM_ID: h:bc991e90-9725-41f4-a8e0-24fc0cf8d608
+:END:
 
 Note that structural and markup parsing are distinct operations: markup is parsed
 entirely within each individual structural element.
 
 ** Structural parsing [41%]
+:PROPERTIES:
+:CUSTOM_ID: h:01258a58-31ad-44e2-b5c2-83ee639750ae
+:END:
 *** Headers [75%]
+:PROPERTIES:
+:CUSTOM_ID: h:306916b1-0341-41c3-bf83-a1ded6f80a09
+:END:
 **** DONE text
+:PROPERTIES:
+:CUSTOM_ID: h:57eabc2c-e75e-49d4-bf05-e9b59a360fb1
+:END:
 **** DONE TODO
+:PROPERTIES:
+:CUSTOM_ID: h:55e5428e-46e1-4a79-b491-354b6da00002
+:END:
 **** DONE priority
+:PROPERTIES:
+:CUSTOM_ID: h:553dcfdf-eca3-443f-abe7-a69885e316b5
+:END:
 **** TODO tags
+:PROPERTIES:
+:CUSTOM_ID: h:a0909f23-c6a8-4502-b7ba-2fff5b2911cd
+:END:
 *** DONE paragraphs
+:PROPERTIES:
+:CUSTOM_ID: h:9f924ab5-9b5d-4808-88f3-b854c6aee026
+:END:
 *** DONE lists
+:PROPERTIES:
+:CUSTOM_ID: h:ba880a56-f312-47fc-a786-a54c4ab906c7
+:END:
     - splat
     - dash
     - plus
@@ -34,7 +81,13 @@ entirely within each individual structural element.
       - [-] two
       - [X] three
 *** DONE link 
+:PROPERTIES:
+:CUSTOM_ID: h:eaa2123d-3a05-40a4-ac6b-314235f7bdbb
+:END:
 *** DONE Blocks
+:PROPERTIES:
+:CUSTOM_ID: h:af09bfad-de76-4b63-b72c-ad39f835ec2d
+:END:
 
     #+BEGIN_QUOTE
     Don't be shy...
@@ -71,27 +124,84 @@ The End
 #+END_CENTER
     
 *** DONE Settings
+:PROPERTIES:
+:CUSTOM_ID: h:be1d9dee-432d-4064-8730-0db06fe39223
+:END:
 *** TODO Tables
+:PROPERTIES:
+:CUSTOM_ID: h:f17706b0-829c-4000-b53a-5cc4aeac51b0
+:END:
 *** TODO Footnotes
+:PROPERTIES:
+:CUSTOM_ID: h:3cc0ee74-8b95-4e30-9629-4cd34391edb1
+:END:
 *** TODO Comments
+:PROPERTIES:
+:CUSTOM_ID: h:010471d1-07b4-47e4-a925-738102cdd681
+:END:
 *** TODO Horizontal Rules
+:PROPERTIES:
+:CUSTOM_ID: h:f08d3846-6d12-4e5e-896d-eda9eb7a986a
+:END:
 *** TODO captions
+:PROPERTIES:
+:CUSTOM_ID: h:66f2e521-139e-43da-86b2-4ebbfe99ef38
+:END:
 *** TODO dates
+:PROPERTIES:
+:CUSTOM_ID: h:327abe8c-346e-45e9-914a-2128ad7cd511
+:END:
     Note: the TODO state change lines are not indented!
 ** Markup parsing [85%]
+:PROPERTIES:
+:CUSTOM_ID: h:493f4717-7c39-4410-84cc-535d80d213ad
+:END:
 *** DONE bold
+:PROPERTIES:
+:CUSTOM_ID: h:13b198c3-ce61-4902-899c-3229cf6151cc
+:END:
 *** DONE underline
+:PROPERTIES:
+:CUSTOM_ID: h:1baffa31-03b3-45b0-ade4-19bdd4db51e3
+:END:
 *** DONE italic
+:PROPERTIES:
+:CUSTOM_ID: h:47447f07-5493-4550-91dd-a5dcb5f4384e
+:END:
 *** DONE link
+:PROPERTIES:
+:CUSTOM_ID: h:3cdf4b6b-da98-42b2-b116-4d2e67e6db8f
+:END:
 *** DONE link target
+:PROPERTIES:
+:CUSTOM_ID: h:a677fc4f-3ed2-46fd-bdb3-4e4c3610d81b
+:END:
 *** DONE radio target
+:PROPERTIES:
+:CUSTOM_ID: h:27eabb56-8299-49df-b9d9-c20a6e4e63b4
+:END:
 *** DONE strikethrough
+:PROPERTIES:
+:CUSTOM_ID: h:5eef40e2-5901-4872-9115-536afc471c12
+:END:
 *** DONE verbatim
+:PROPERTIES:
+:CUSTOM_ID: h:94f2815f-bf0a-46c5-bf44-08a33a71b95a
+:END:
 *** TODO radio target references
+:PROPERTIES:
+:CUSTOM_ID: h:9c47a324-1a5f-49f6-9fd8-940246ae13a4
+:END:
 
 * Alternatives
+:PROPERTIES:
+:CUSTOM_ID: h:3a6e3b58-bd27-42f5-ae75-badf571261d9
+:END:
 
 ** Parsing
+:PROPERTIES:
+:CUSTOM_ID: h:397a3f9a-89c1-4ccb-9916-84c9ae0c51fe
+:END:
 
    - [[https://hackage.haskell.org/package/org-mode][org-mode]]
      + list items can only be */simple text/*.

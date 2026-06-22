@@ -29,10 +29,12 @@ module OrgMode.Sayable.HTML
   )
 where
 
+import           Data.Bool ( bool )
 import           Data.Char ( chr, toUpper )
 import           Data.Foldable
 import qualified Data.List as L
 import           Data.Maybe ( isJust )
+import           Data.Text ( pack )
 import           GHC.Records ( getField )
 import           Text.Sayable
 
@@ -48,15 +50,47 @@ import           Prelude hiding ( lines )
 instance ( $(sayableSubConstraints $ ofType ''OrgDoc >> tagSym "html")
          ) => Sayable "html" OrgDoc where
   sayable od =
+    "<html xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"en\" xml:lang=\"en\">"
+    &< "<head>"
+    &< (DV.fromList $ L.filter isSetting $ DV.toList $ getField @"body" od)
+    &< "</head>"
+    &< "<body>"
     -- show od &<
-    getField @"body" od &< getField @"sections" od
+    &< (DV.fromList $ L.filter (not . isSetting) $ DV.toList $ getField @"body" od)
+    &< getField @"sections" od
+    &< "</body>"
+    &< "</html>"
+    &< ""
 
 
 ----------------------------------------------------------------------
 
 instance ( Sayable "html" OrgBody
          ) => Sayable "html" (DV.Vector OrgBody) where
-  sayable = foldlNES @"html" (&<) . DV.toList
+  sayable =
+    let joinLines a b =
+          case b of
+            OrgBody_setting setting ->
+              -- n.b. since some settings are not applied, break the newline
+              -- general rule and be explicit here when appropriate.
+              let kw = fmap toUpper $ DV.vecToString $ getField @"keyword" setting
+              in if kw `elem` [ "TITLE", "AUTHOR", "EMAIL"
+                              , "DESCRIPTION"
+                              , "HTML_HEAD"
+                              , "HTML_HEAD_EXTRA"
+                              , "HTML_DOCTYPE"
+                              , "HTML_CONTAINER"
+                              , "HTML_LINK_HOME"
+                              , "HTML_LINK_UP"
+                              , "HTML_MATHJAX"
+                              , "KEYWORDS"
+                              , "LATEX_HEADER"
+                              , "SUBTITLE"
+                              ]
+                 then a &< b
+                 else a  -- drop b, it's probably blank (see Sayable OrgBody)
+            _ -> a &< b
+    in foldlNES @"html" joinLines . DV.toList
 
 
 ----------------------------------------------------------------------
@@ -98,9 +132,18 @@ instance ($(sayableSubConstraints $ ofType ''OrgBody >> tagSym "html")
       OrgBody_plusList l -> sayList l
       OrgBody_enumList l -> "<ol>" &< l &< "</ol>"
       OrgBody_splatList l -> sayList l
-      OrgBody_drawer {} -> "tbd drawer" &- '!'
+      OrgBody_drawer {} -> blank
       OrgBody_aBlock b -> sayable @"html" b
-      OrgBody_setting {} -> "tbd setting" &- '!'
+      OrgBody_setting setting ->
+        let vs = orgMarkupParseLine $ getField @"values" setting
+        in case fmap toUpper $ DV.vecToString $ getField @"keyword" setting of
+             "AUTHOR" -> "<meta name=\"author\" content=\"" &+ vs &+ '"' &- "/>"
+             "DESCRIPTION" ->
+               "<meta name=\"description\" content=\"" &+ vs &+ '"' &- "/>"
+             "TITLE" -> "<title>" &+ vs &+ "</title>"
+             "HTML_HEAD" -> sayable @"html" vs
+             "HTML_HEAD_EXTRA" -> sayable @"html" vs
+             _ -> blank
       OrgBody_paragraph p -> "<p>" &< sayable (orgMarkupParse p) &< "</p>"
 
 isDescriptionList :: DV.Vector ListItem -> Bool
@@ -250,6 +293,7 @@ instance Sayable "html" OrgText where
       OrgText_strikethrough e -> "<s>" &+ e &+ "</s>"
       OrgText_link_target _ -> blank
       OrgText_radio_target t -> sayable @"html" t
+      OrgText_export kind ls -> bool blank (toLines ls) $ kind == pack "@html"
 
       -- OrgText_code ls -> "\n<div class=\"code\">"
       --                    &< "<pre>"

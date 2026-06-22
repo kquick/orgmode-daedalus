@@ -1,3 +1,8 @@
+README Sample
+=============
+  by Kevin Quick, Someright 2026
+     Kevin Quick <kq1quick@gmail.com>
+
 * orgmode-daedalus
 
   A parser and pretty-printer for the Org-Mode (https://orgmode.org) document
@@ -178,5 +183,4 @@
     + no  markup or block support
 
     + no pretty-printing
-
 

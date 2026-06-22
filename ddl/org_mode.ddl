@@ -580,20 +580,41 @@ def $regular_first_char = $any - ( $end_word
                                  | $unordered_list_mark
                                  )
 
-def CheckSpecialWords knownPara inDrawer word =
+def CheckSpecialWords knownPara inDrawer word = -- see also 'def Setting ='
       case (lowercase word) of
         "#+archive:" -> Fail "bad word: setting"
+        "#+author:" -> Fail "bad word: setting"
         "#+category:" -> Fail "bad word: setting"
         "#+columns:" -> Fail "bad word: setting"
         "#+constants:" -> Fail "bad word: setting"
+        "#+description:" -> Fail "bad word: setting"
+        "#+email:" -> Fail "bad word: setting"
         "#+filetags:" -> Fail "bad word: setting"
+        "#+html_doctype:" -> Fail "bad word: setting"
+        "#+html_container:" -> Fail "bad word: setting"
+        "#+html_link_home:" -> Fail "bad word: setting"
+        "#+html_link_up:" -> Fail "bad word: setting"
+        "#+html_mathjax:" -> Fail "bad word: setting"
+        "#+html_head:" -> Fail "bad word: setting"
+        "#+html_head_extra:" -> Fail "bad word: setting"
+        "#+keywords:" -> Fail "bad word: setting"
+        "#+language:" -> Fail "bad word: setting"
+        "#+latex_class:" -> Fail "bad word: setting"
+        "#+latex_class_options:" -> Fail "bad word: setting"
+        "#+latex_class_pre:" -> Fail "bad word: setting"
+        "#+latex_compiler:" -> Fail "bad word: setting"
+        "#+latex_header:" -> Fail "bad word: setting"
+        "#+latex_header_extra:" -> Fail "bad word: setting"
         "#+link:" -> Fail "bad word: setting"
         "#+name:" -> Fail "bad word: link target"
         "#+priorities:" -> Fail "bad word: setting"
         "#+property:" -> Fail "bad word: setting"
+        "#+options:" -> Fail "bad word: setting"
         "#+setupfile:" -> Fail "bad word: setting"
         "#+startup:" -> Fail "bad word: setting"
+        "#+subtitle:" -> Fail "bad word: setting"
         "#+tags:" -> Fail "bad word: setting"
+        "#+title:" -> Fail "bad word: setting"
         "#+todo:" -> Fail "bad word: setting"
         ":end:" -> if inDrawer then Fail "drawer ending keyword" else ^word
         _ ->
@@ -661,19 +682,39 @@ def Setting =
   block
     Whitespace
     Match "#+"
-    keyword = First
+    keyword = First  -- also update CheckSpecialWords
       AnyCaseWord "ARCHIVE"
+      AnyCaseWord "AUTHOR"
       AnyCaseWord "CATEGORY"
       AnyCaseWord "COLUMNS"
       AnyCaseWord "CONSTANTS"
+      AnyCaseWord "DESCRIPTION"
+      AnyCaseWord "EMAIL"
       AnyCaseWord "FILETAGS"
-      AnyCaseWord "LINK"
+      AnyCaseWord "HTML_DOCTYPE"
+      AnyCaseWord "HTML_CONTAINER"
+      AnyCaseWord "HTML_LINK_HOME"
+      AnyCaseWord "HTML_LINK_UP"
+      AnyCaseWord "HTML_MATHJAX"
+      AnyCaseWord "HTML_HEAD"
+      AnyCaseWord "HTML_HEAD_EXTRA"
+      AnyCaseWord "KEYWORDS"
+      AnyCaseWord "LANGUAGE"
+      AnyCaseWord "LATEX_CLASS_OPTIONS"
+      AnyCaseWord "LATEX_CLASS_PRE"
+      AnyCaseWord "LATEX_CLASS"
+      AnyCaseWord "LATEX_COMPILER"
+      AnyCaseWord "LATEX_HEADER"
+      AnyCaseWord "LATEX_HEADER_EXTRA"
       AnyCaseWord "NAME"  -- actually a link target, not a setting
+      AnyCaseWord "OPTIONS"
       AnyCaseWord "PRIORITIES"
       AnyCaseWord "PROPERTY"
       AnyCaseWord "SETUPFILE"
       AnyCaseWord "STARTUP"
+      AnyCaseWord "SUBTITLE"
       AnyCaseWord "TAGS"
+      AnyCaseWord "TITLE"
       AnyCaseWord "TODO"
     $colon
     values =

@@ -18,7 +18,7 @@ module OrgMode.Markup
   , OrgText'(..), OrgText
   , OrgPara
   , OrgLink(..)
-  , displayLength
+  , DisplayLength, displayLength
   , OrgText'F(..)
   , OrgLinkF(..)
   )
@@ -161,7 +161,7 @@ detectMarkup =
                 _ ->
                   -- same plain group, add to current group
                   ((curMark, (addToCurr w inProg, isAdj)), groups)
-            Just m ->
+            Just (markup, m) ->
               -- one-word markup?
               -- yes: close inprog and add one-word markup
               -- no: start a new group with this markup char
@@ -169,14 +169,21 @@ detectMarkup =
               then let (acc, (newInProg', isAdj'')) =
                          newGroupWithMarkup NoMarkup isAdj inProg groups
                        (acc2, newInProgAdj) =
-                         newGroupWithMarkup (Markup m) isAdj'' (w:newInProg')
+                         newGroupWithMarkup (markup m) isAdj'' (w:newInProg')
                          acc
                    in ((NoMarkup, newInProgAdj), acc2)
               else let (acc, (newInProg, isAdj')) =
                          newGroupWithMarkup curMark isAdj inProg groups
-                   in ((Markup m, (addToCurr w newInProg, isAdj')), acc)
+                   in ((markup m, (addToCurr w newInProg, isAdj')), acc)
         Markup m ->
           if endMarkupMatches m w
+          then let (acc, newInProgAdj) =
+                     newGroupWithMarkup curMark isAdj (addToCurr w inProg) groups
+               in ((NoMarkup, newInProgAdj), acc)
+          else -- same markup group, add to current group
+            ((curMark, (addToCurr w inProg, isAdj)), groups)
+        ExportMarkup _ ->
+          if endMarkupMatches "@@" w
           then let (acc, newInProgAdj) =
                      newGroupWithMarkup curMark isAdj (addToCurr w inProg) groups
                in ((NoMarkup, newInProgAdj), acc)
@@ -203,7 +210,7 @@ detectMarkup =
           t1m = detectMarkup t1
           newAccAdj = case p of
                         Nothing -> ([], False)
-                        Just _ -> ([p], True)
+                        Just p' -> (Just <$> p', True)
           joinPlain = \case
             (OrgText_text a : OrgText_text b : c) ->
               case L.uncons a of
@@ -237,6 +244,10 @@ detectMarkup =
                               ["Unknown/unsupported markup marker: " <> show o]
                    ) : acc
                   , newAccAdj)
+           ExportMarkup k ->
+             if null t1
+             then (acc, ([], isAdj))
+             else (OrgText_export k (backToLines t1) : acc, ([], True)) -- True: eat next space
            Link ->
              let mkLink l d = OrgText_link (OrgLink (T.drop 2 l) d) : acc
              in case L.uncons $ L.reverse t of
@@ -257,19 +268,23 @@ detectMarkup =
     addToCurr = (:)
 
     -- n.b. returns what should be the *end* markup if this is the beginning
-    begMarkup :: Maybe Text -> Maybe Text
+    begMarkup :: Maybe Text -> Maybe (Text -> MarkupContext, Text)
     begMarkup = maybe Nothing $ \w ->
       case T.uncons w of
         Just (c,w') | c `elem` markupChars, not (T.null w') ->
-          Just $ T.singleton c
+          Just (Markup, T.singleton c)
         Just ('<',w') | not (T.null w') ->
           case T.uncons w' of
             Just ('<',w'') | not (T.null w'') ->
               case T.uncons w'' of
                 Just (c',w3) ->
-                  if c' == '<' && not (T.null w3) then Just ">>>" else Just ">>"
+                  Just (Markup, bool ">>" ">>>" $ c' == '<' && not (T.null w3))
                 _ -> Nothing
             _ -> Nothing
+        Just ('@',w') | "@" `T.isPrefixOf` w'
+                      , (k,c) <- T.break (== ':') w'
+                      , not (T.null c)
+                        -> Just (const (ExportMarkup k), "@@")
         _ -> Nothing
 
     -- avoid ending punctuation
@@ -285,11 +300,11 @@ detectMarkup =
     removeBegMarkup m ws =
       let rmv = case m of
             Markup m' -> T.drop (T.length m')
+            ExportMarkup k -> T.drop (2 + T.length k)
             _ -> panic OrgMarkup "removeBegMarkup rmv"
                  [ "Should not be called with other types of markup" ]
       in case L.reverse ws of
-           (Just w:ws') ->
-             L.reverse $ Just (rmv w) : ws'
+           (Just w:ws') -> L.reverse $ Just (rmv w) : ws'
            [] -> panic OrgMarkup "removeBegMarkup - empty"
                  [ "Should not have an empty list for a markup region start." ]
            (Nothing:_) ->
@@ -297,17 +312,24 @@ detectMarkup =
              [ "First element should have been the markup opener." ]
 
     -- Avoid ending punctuation.
-    removeEndMarkup :: MarkupContext -> [Maybe Text] -> ([Maybe Text], Maybe Text)
+    removeEndMarkup :: MarkupContext -> [Maybe Text]
+                    -> ([Maybe Text], Maybe [Text])
     removeEndMarkup m ws =
       let rmv = case m of
             Markup m' -> T.dropEnd (T.length m')
+            ExportMarkup {} -> T.dropEnd 2
             _ -> panic OrgMarkup "removeBegMarkup rmv"
                  [ "Should not be called with other types of markup" ]
       in case L.uncons ws of
            Just (Just w,ws') ->
              let adj_punct = T.takeWhileEnd (`elem` endPunctuation) w
                  unpunct = T.dropWhileEnd (`elem` endPunctuation)
-                 adj = if T.null adj_punct then Nothing else Just adj_punct
+                 adj = if T.null adj_punct
+                       then case m of
+                              Markup "@@" -> Just []
+                              ExportMarkup {} -> Just []
+                              _ -> Nothing
+                       else Just [adj_punct]
              in (Just (rmv $ unpunct w) : ws', adj)
            Nothing -> panic OrgMarkup "removeEndMarkup"
                       ["Should not have an empty list for a markup region end."]
@@ -318,7 +340,10 @@ detectMarkup =
     markupChars = "*_/~=+" :: String
     endPunctuation = "!,.;'\")]:" :: String
 
-data MarkupContext = NoMarkup | Markup Text | Link
+data MarkupContext = NoMarkup
+                   | Markup Text -- MtextMpunc where M is in markupChars
+                   | ExportMarkup Text -- @@kind:...@@
+                   | Link -- [[link]] or [[link][description]]
 
 -- | Type alias for an OrgBody_para
 type OrgPara = DV.Vector (DV.Vector (DV.Vector (UInt 8)))
@@ -342,6 +367,7 @@ data OrgText' t = OrgText_text [[t]]
                   -- ^ the link and optional description
                 | OrgText_link_target Text
                 | OrgText_radio_target [OrgText' t]
+                | OrgText_export Text [[Text]]
   deriving (Eq, Show, Functor)
 
 type OrgText = OrgText' Text
@@ -381,6 +407,8 @@ instance ( DisplayLength [t]
       OrgText_linkF lnk -> displayLength lnk
       OrgText_link_targetF _ -> 0
       OrgText_radio_targetF l -> maximum l
+      OrgText_exportF "ascii" what -> maximum (displayLength <$> what)
+      OrgText_exportF {} -> -1 -- decrement interspace calc for adjacency
 
 instance DisplayLength t => DisplayLength [t] where
   displayLength wrds = sum (fmap displayLength wrds) + length wrds - 1
