@@ -328,7 +328,7 @@ data OrgText' t = OrgText_text [[t]]
                 | OrgText_adj [[t]]
                   -- ^ same as OrgText_text, except the last word of a previous
                   -- OrgText_text and the first word of the following OrgText_text
-                  -- are separate words and should have whitespace betwen them,
+                  -- are separate words and should have whitespace between them,
                   -- whereas an OrgText_adj is immediately adjacent to the last
                   -- word of the previous OrgText_text (e.g. typically contains
                   -- punctuation characters).
