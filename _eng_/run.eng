@@ -13,9 +13,8 @@ dev =
       Uses nix to build with current GHC versions
         in dir = {TopDir}
         notes =
-           * GHC 9.12 still waiting for th-desugar 1.18 in nixpkgs
-           * GHC 9.14 wait on alex-tools lifting bounds: base, template-haskell
-        exec = nix build --no-link .#orgmode-daedalus.ghc910
+           * GHC 9.14 waiting on: alex-tools hedgehog-classes tasty-hspec rebase
+        exec = nix build --no-link .#orgmode-daedalus.ghc910 .#orgmode-daedalus.ghc912
 
     nixbuild:old
       Uses nix to build with old GHC versions
