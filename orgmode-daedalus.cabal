@@ -22,7 +22,7 @@ build-type:         Simple
 
 extra-doc-files:    CHANGELOG.md
 
-extra-source-files: ddl/org-mode.ddl
+extra-source-files: ddl/org_mode.ddl
 
 common config
     ghc-options: -Wall
