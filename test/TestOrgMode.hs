@@ -8,15 +8,16 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE PatternSynonyms #-}
 {-# LANGUAGE RankNTypes #-}
+{-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeApplications #-}
 {-# LANGUAGE UndecidableInstances #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 {-# OPTIONS_GHC -Wno-missing-signatures #-}
 
 {- |
-Module       : TestOrgMOde
-Description  : Taphos source
-Copyright    : (c) 2026, Galois, Inc.
+Module       : TestOrgMode
+Description  : Tests for org mode
+Copyright    : (c) 2026, Kevin Quick
 License      : BSD3
 Stability    : provisional
 Portability  : portable
@@ -84,6 +85,10 @@ instance TestShow (UInt 8) where
   testShow v = shows v
                (("/0x" :: String) <> showHex (asInt v)
                 ("/'" <> (maybe '?' chr (toInt $ asInt v) : "'")))
+
+
+$(includeOrgInSource "README.org" "readmeDoc")
+
 
 atVIdx :: DV.VecElem a => Int -> DV.Vector a -> Maybe a
 atVIdx i l = l DV.!? lit (toInteger i)
@@ -1791,6 +1796,17 @@ testOrgMode = testSpec "OrgMode" $ do
          ])
        :> Val "num sections" (F.length . DV.toList . getField @"sections") 0
       )
+
+  ----------------------------------------------------------------------
+
+  describe "imported" $ do
+    verify "Org80" "import an org document" $ \_ ->
+      readmeDoc `checkValues`
+      (Empty
+       :> Val "num sections" (F.length . DV.toList . getField @"sections") 3
+       :> Val "main body size" (F.length . DV.toList . getField @"body") 0
+      )
+
 
 toWord :: String ->  DV.Vector (UInt 8)
 toWord = DV.fromList . fmap (lit . toInteger . ord)  -- aka. DV.stringToVec

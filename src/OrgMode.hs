@@ -4,6 +4,7 @@ module OrgMode
   , orgMarkupParse
   , orgMarkupParseLine
   , displayLength
+  , includeOrgInSource
   , OrgDoc(..)
   , OrgSection(..)
   , OrgBody(..)
@@ -20,3 +21,4 @@ where
 import OrgMode.Markup
 import OrgMode.Parse
 import OrgMode.Sayable ()
+import OrgMode.Include
