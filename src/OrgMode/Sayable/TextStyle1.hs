@@ -1,5 +1,6 @@
 {-# LANGUAGE ConstraintKinds #-}
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE DeriveFunctor #-}
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE LambdaCase #-}
@@ -47,10 +48,26 @@ import           OrgMode.Parse
 import           OrgMode.Sayable.Defs
 
 
-data SectionLevel a = SectionLvl [Int] a
-  -- the array of ints is the reverse order current nested section numbering
+type ReverseSectionNumbering = [Int]
+-- the array of ints is the reverse order current nested section numbering
 
-$(return [])
+data SectionLevel a = SectionLvl ReverseSectionNumbering a
+  deriving Functor
+
+
+slEmptyWrap :: a -> SectionLevel a
+slEmptyWrap = SectionLvl mempty
+
+slItem :: SectionLevel a -> a
+slItem (SectionLvl _ a) = a
+
+slAddLevel :: Int -> SectionLevel a -> SectionLevel a
+slAddLevel n (SectionLvl ns a) = SectionLvl (n:ns) a
+
+slLevel :: SectionLevel a -> [Int] -- forward ordered
+slLevel (SectionLvl l _) = L.reverse l
+
+$(return []) -- Make SectionLevel available at the Template Haskell level
 
 
 -- The general implementation guideline here is that lists/vectors of items
@@ -72,12 +89,14 @@ instance ( $(sayableSubConstraints $ do ofType ''SectionLevel
   sayable od =
     -- show od &<
     if null $ DV.toList $ getField @"sections" od
-    then sayable @"text-style1" $ SectionLvl mempty (getField @"body" od) &< ""
+    then sayable @"text-style1"
+         $ SectionLvl mempty Nothing (getField @"body" od) &< ""
     else if null $ DV.toList $ getField @"body" od
-         then sayable @"text-style1" $ SectionLvl mempty (getField @"sections" od) &< ""
-         else SectionLvl mempty (getField @"body" od)
+         then sayable @"text-style1"
+              $ SectionLvl mempty Nothing (getField @"sections" od) &< ""
+         else SectionLvl mempty Nothing (getField @"body" od)
               &< ""
-              &< SectionLvl mempty (getField @"sections" od)
+              &< SectionLvl mempty Nothing (getField @"sections" od)
               &< ""
 
 
@@ -93,7 +112,7 @@ centerLine tw a =
 
 instance ( Sayable "text-style1" OrgBody
          ) => Sayable "text-style1" (DV.Vector OrgBody) where
-  sayable = sayable . SectionLvl mempty
+  sayable = sayable . slEmptyWrap
 
 instance ( Sayable "text-style1" (SectionLevel OrgBody)
          , Sayable "text-style1" (DV.Vector OrgBody)
@@ -101,19 +120,19 @@ instance ( Sayable "text-style1" (SectionLevel OrgBody)
                                         tagSym "text-style1"
                                         paramTH (TH.ConT ''OrgBody))
          ) => Sayable "text-style1" (SectionLevel (DV.Vector OrgBody)) where
-  sayable (SectionLvl ls obs) =
+  sayable sl =
     let joinLines a b =
           case b of
-            SectionLvl _ (OrgBody_setting setting) ->
+            sl' | OrgBody_setting setting <- slItem sl' ->
               -- n.b. since some settings are not applied, break the newline
               -- general rule and be explicit here when appropriate.
               let kw = fmap toUpper $ DV.vecToString $ getField @"keyword" setting
-              in if kw `elem` [ "TITLE", "AUTHOR", "EMAIL" ]
+              in if kw `elem` [ "TITLE", "SUBTITLE", "AUTHOR", "EMAIL" ]
                  then a &< b
                  else a  -- drop b, it's probably blank (see Sayable OrgBody)
             _ -> withBlankLine a b
-        showableBody = L.filter (not . isDrawer) $ DV.toList obs
-    in foldlNES @"text-style1" joinLines (SectionLvl ls <$> showableBody)
+        showableBody = L.filter (not . isDrawer) $ DV.toList $ slItem sl
+    in foldlNES @"text-style1" joinLines ((`fmap` sl) . const <$> showableBody)
 
 
 ----------------------------------------------------------------------
@@ -121,25 +140,26 @@ instance ( Sayable "text-style1" (SectionLevel OrgBody)
 instance ( $(sayableSubConstraints $ ofType ''OrgSection >> tagSym "text-style1")
          , Sayable "text-style1" OrgSection
          ) => Sayable "text-style1" (DV.Vector OrgSection) where
-  sayable = sayable . SectionLvl mempty
+  sayable = sayable . slEmptyWrap
 
 instance ( Sayable "text-style1" (DV.Vector OrgSection)
          , Sayable "text-style1" (SectionLevel OrgSection)
          ) => Sayable "text-style1" (SectionLevel (DV.Vector OrgSection)) where
-  sayable (SectionLvl ls o) =
-    let between = case DV.toList o of
+  sayable sl =
+    let o = slItem sl
+        between = case DV.toList o of
                     [] -> (&<)
                     (s:_) -> if asInt (getField @"level" s) == 1
                              then (\a b -> a &< "" &< "" &< b)
                              else withBlankLine
     in foldlNES @"text-style1" between
-       $ fmap (uncurry SectionLvl)
-       $ zip (fmap (:ls) [1..]) $ DV.toList o
+       $ fmap (\(n,v) -> slAddLevel n (const v <$> sl))
+       $ zip [1..] $ DV.toList o
 
 instance
   ( $(sayableSubConstraints $ ofType ''OrgSection >> tagSym "text-style1")
   ) => Sayable "text-style1" OrgSection where
-  sayable = sayable . SectionLvl mempty
+  sayable = sayable . slEmptyWrap
 
 
 instance
@@ -149,13 +169,14 @@ instance
   , Sayable "text-style1" (SectionLevel OrgSection)
   , Sayable "text-style1" (SectionLevel OrgBody)
   ) => Sayable "text-style1" (SectionLevel OrgSection) where
-  sayable (SectionLvl ls s) =
-    let tdo = addTodoAnn . DV.vecToString <$> getField @"todo" s
+  sayable sl =
+    let s = slItem sl
+        tdo = addTodoAnn . DV.vecToString <$> getField @"todo" s
         addTodoAnn "TODO" = PP.annotate #todo &! "TODO"
         addTodoAnn "DONE" = PP.annotate #done &! "DONE"
         addTodoAnn o = PP.annotate #todo &! o
         hdr = let h = orgMarkupParseLine $ getField @"header" s
-                  sn = sez @"text-style1" $ '.' &:* (L.reverse ls)
+                  sn = sez @"text-style1" $ '.' &:* slLevel sl
                   l = maximum (displayLength <$> h) + length sn + 1
                       + maybe 0 (succ . length . DV.vecToString)
                         (getField @"todo" s)
@@ -165,12 +186,11 @@ instance
                    3 -> sn &? tdo &- h &< T.replicate l (T.singleton '╌')
                    _ -> '◊' &- sn &? tdo &- h
         subs = foldlNES @"text-style1" withBlankLine
-               (fmap (uncurry SectionLvl)
-                $ zip (fmap (:ls) [1..])
-                $ DV.toList $ getField @"sections" s)
+               (fmap (\(n,v) -> slAddLevel n (const v <$> sl))
+                $ zip [1..] $ DV.toList $ getField @"sections" s)
         lnks = foldl collectLinks mempty $ DV.toList $ getField @"body" s
         body = foldl addLinkRef
-               (PP.indent 2 &! SectionLvl ls (getField @"body" s))
+               (PP.indent 2 &! (const (getField @"body" s) <$> sl))
                $ L.reverse lnks
         addLinkRef a (l, mbd) =
           case mbd of
@@ -197,17 +217,18 @@ instance ($(sayableSubConstraints $ ofType ''OrgBody >> tagSym "text-style1")
          , Sayable "text-style1" OrgText
          , Sayable "text-style1" BodyList
          ) => Sayable "text-style1" OrgBody where
-  sayable = sayable . SectionLvl mempty
+  sayable = sayable . slEmptyWrap
 
 instance ( Sayable "text-style1" OrgBody
          ) => Sayable "text-style1" (SectionLevel OrgBody) where
-  sayable (SectionLvl n ob) =
-    case ob of
-      OrgBody_paragraph p -> sayable @"text-style1" (SectionLvl n $ orgMarkupParse p)
-      OrgBody_dashList l -> (PP.align &! SectionLvl n (BulletList '•' l))
-      OrgBody_plusList l -> (PP.align &! SectionLvl n (BulletList '⁃' l))
-      OrgBody_enumList l -> (PP.align &! SectionLvl n (EnumList l))
-      OrgBody_splatList l -> (PP.align &! SectionLvl n (BulletList '*' l))
+  sayable sl =
+    case slItem sl of
+      OrgBody_paragraph p ->
+        sayable @"text-style1" ((const $ orgMarkupParse p) <$> sl)
+      OrgBody_dashList l -> PP.align &! (const (BulletList '•' l) <$> sl)
+      OrgBody_plusList l -> PP.align &! (const (BulletList '⁃' l) <$> sl)
+      OrgBody_enumList l -> PP.align &! (const (EnumList l) <$> sl)
+      OrgBody_splatList l -> PP.align &! (const (BulletList '*' l) <$> sl)
       OrgBody_aBlock b -> sayable @"text-style1" b
       OrgBody_drawer {} -> blank
       OrgBody_setting setting ->
@@ -258,18 +279,19 @@ data BodyList = BulletList Char (DV.Vector ListItem)
 instance ( Sayable "text-style1" (DV.Vector ListItem)
          , Sayable "text-style1" ListItem
          ) => Sayable "text-style1" BodyList where
-  sayable = sayable . SectionLvl mempty
+  sayable = sayable . slEmptyWrap
 
 instance ( Sayable "text-style1" (SectionLevel (DV.Vector ListItem))
          , Sayable "text-style1" (SectionLevel ListItem)
          ) => Sayable "text-style1" (SectionLevel BodyList) where
-  sayable = \case
-    (SectionLvl n (BulletList c lis)) ->
-      let eachItem i = c &- (PP.align &! SectionLvl n i)
-      in foldlNES (listSep lis) (eachItem <$> DV.toList lis)
-    (SectionLvl n (EnumList lis)) ->
-      let eachItem (c,i) = c &+ '.' &- (PP.align &! SectionLvl n i)
-      in foldlNES (listSep lis) (eachItem <$> zip [(1::Int)..] (DV.toList lis))
+  sayable sl =
+    case slItem sl of
+      (BulletList c lis) ->
+        let eachItem i = c &- (PP.align &! (const i <$> sl))
+        in foldlNES (listSep lis) (eachItem <$> DV.toList lis)
+      (EnumList lis) ->
+        let eachItem (c,i) = c &+ '.' &- (PP.align &! (const i <$> sl))
+        in foldlNES (listSep lis) (eachItem <$> zip [(1::Int)..] (DV.toList lis))
 
 listSep :: ( HasField "more" a (DV.Vector OrgBody)
            , HasField "entry" a OrgPara
@@ -288,20 +310,21 @@ listSep lis =
   in bool withBlankLine (&<) $ maximum itemLengths < 70
 
 instance Sayable "text-style1" ListItem => Sayable "text-style1" (DV.Vector ListItem) where
-  sayable = sayable . SectionLvl mempty
+  sayable = sayable . slEmptyWrap
 
 instance Sayable "text-style1" ListItem where
-  sayable = sayable . SectionLvl mempty
+  sayable = sayable . slEmptyWrap
 
 instance Sayable "text-style1" (SectionLevel ListItem)
   => Sayable "text-style1" (SectionLevel (DV.Vector ListItem)) where
-  sayable (SectionLvl n ls) =
-    let eachItem s i = s &< '-' &- PP.align &! SectionLvl n i
-    in foldlNES eachItem $ DV.toList ls
+  sayable sl =
+    let eachItem s i = s &< '-' &- PP.align &! (const i <$> sl)
+    in foldlNES eachItem $ DV.toList $ slItem sl
 
 instance Sayable "text-style1" (SectionLevel ListItem) where
-  sayable (SectionLvl n li) =
-    let cb = case chr . fromInteger . asInt <$> getField @"checkbox" li of
+  sayable sl =
+    let li = slItem sl
+        cb = case chr . fromInteger . asInt <$> getField @"checkbox" li of
                Just ' ' -> '☐' &+ ' '
                Just '-' -> '☒' &+ ' '
                Just 'X' -> '☑' &+ ' '
@@ -313,8 +336,8 @@ instance Sayable "text-style1" (SectionLevel ListItem) where
         entry = orgMarkupParse $ getField @"entry" li
         more = getField @"more" li
     in if L.null (DV.toList more)
-       then cb &+ term &+ SectionLvl n entry
-       else cb &+ term &+ SectionLvl n entry &< "" &< SectionLvl n more
+       then cb &+ term &+ (const entry <$> sl)
+       else cb &+ term &+ (const entry <$> sl) &< "" &< (const more <$> sl)
 
 ----------------------------------------------------------------------
 
@@ -351,15 +374,16 @@ instance Sayable "text-style1" Setting where
 
 instance ( Sayable "text-style1" OrgText
          ) => Sayable "text-style1" [OrgText] where
-  sayable = sayable . SectionLvl mempty
+  sayable = sayable . slEmptyWrap
 
 instance Sayable "text-style1" OrgText where
-  sayable = sayable . SectionLvl mempty
+  sayable = sayable . slEmptyWrap
 
 instance ( Sayable "text-style1" (SectionLevel OrgText)
          ) => Sayable "text-style1" (SectionLevel [OrgText]) where
-  sayable (SectionLvl n ots) =
-      let moreSay ((s,ls), a) ot =
+  sayable sl =
+      let ots = slItem sl
+          moreSay ((s,ls), a) ot =
             let s' = case ot of
                        OrgText_adj _ -> True
                        _ -> False
@@ -367,8 +391,8 @@ instance ( Sayable "text-style1" (SectionLevel OrgText)
                            OrgText_link {} -> ot : ls
                            _ -> ls)
                , if or [s, s']
-                 then a &+ SectionLvl n ot
-                 else a &- SectionLvl n ot
+                 then a &+ (const ot <$> sl)
+                 else a &- (const ot <$> sl)
                )
           r = foldl moreSay ((True, []), sayable @"text-style1" "") ots
       in if L.null ots
@@ -376,8 +400,9 @@ instance ( Sayable "text-style1" (SectionLevel OrgText)
          else snd r
 
 instance Sayable "text-style1" (SectionLevel OrgText) where
-  sayable (SectionLvl n ot) =
-    let toLines ts =
+  sayable sl =
+    let ot = slItem sl
+        toLines ts =
           let paras = L.groupBy (const (not . T.null)) $ concat ts
               eachPara ls = PP.fillSep (saying . sayable @"text-style1" <$> ls)
           in foldlNES @"text-style1" withBlankLine (eachPara <$> paras)
@@ -386,15 +411,15 @@ instance Sayable "text-style1" (SectionLevel OrgText) where
          OrgText_adj txt -> toLines txt
          OrgText_link lnk -> sayable @"text-style1" lnk
          OrgText_code tl -> '`' &+ PP.annotate #code &! toLines tl &+ '\''
-         OrgText_bold e -> PP.annotate #bold &! ('*' &+ SectionLvl n e &+ '*')
+         OrgText_bold e -> PP.annotate #bold &! ('*' &+ (const e <$> sl) &+ '*')
          OrgText_italics e -> PP.annotate #italics
-                              &! ('/' &+ SectionLvl n e &+ '/')
+                              &! ('/' &+ (const e <$> sl) &+ '/')
          OrgText_underline e -> PP.annotate #underline
-                                &! ('_' &+ SectionLvl n e &+ '_')
+                                &! ('_' &+ (const e <$> sl) &+ '_')
          OrgText_verbatim e -> PP.annotate #verbatim
-                               &! ('`' &+ SectionLvl n e &+ "'")
+                               &! ('`' &+ (const e <$> sl) &+ "'")
          OrgText_strikethrough e -> PP.annotate #strikethrough
-                                    &! ('+' &+ SectionLvl n e &+ '+')
+                                    &! ('+' &+ (const e <$> sl) &+ '+')
          OrgText_link_target _ -> blank
          OrgText_radio_target t -> sayable @"text-style1" t -- target ignored for now
          OrgText_export kind ls -> bool blank (toLines ls) $ kind == T.pack "@ascii"
