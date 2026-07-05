@@ -1,4 +1,5 @@
 #+TITLE: README Sample
+#+SUBTITLE: Testing Validation Document
 #+AUTHOR: Kevin Quick, Someright 2026
 #+EMAIL: Kevin Quick <kq1quick@gmail.com>
 #+DESCRIPTION: README Sample for Testing

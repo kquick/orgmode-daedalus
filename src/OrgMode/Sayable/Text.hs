@@ -72,7 +72,7 @@ instance ( Sayable "text" OrgBody
               -- n.b. since some settings are not applied, break the newline
               -- general rule and be explicit here when appropriate.
               let kw = fmap toUpper $ DV.vecToString $ getField @"keyword" setting
-              in if kw `elem` [ "TITLE", "AUTHOR", "EMAIL" ]
+              in if kw `elem` [ "TITLE", "SUBTITLE", "AUTHOR", "EMAIL" ]
                  then a &< b
                  else a  -- drop b, it's probably blank (see Sayable OrgBody)
             _ -> withBlankLine a b
@@ -128,6 +128,9 @@ instance ($(sayableSubConstraints $ ofType ''OrgBody >> tagSym "text")
         "TITLE" -> let ttl = orgMarkupParseLine $ getField @"values" setting
                        ttllen = displayLength ttl
                    in ttl &< replicate ttllen '='
+        "SUBTITLE" -> let ttl = orgMarkupParseLine $ getField @"values" setting
+                          ttllen = displayLength ttl
+                      in ttl &< replicate ttllen '-'
         _ -> blank
     OrgBody_paragraph p -> sayable @"text" $ orgMarkupParse p
 

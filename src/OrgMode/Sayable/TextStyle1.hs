@@ -31,6 +31,7 @@ module OrgMode.Sayable.TextStyle1
   )
 where
 
+import           Control.Applicative ( asum )
 import           Data.Bool ( bool )
 import           Data.Char ( chr, toUpper )
 import qualified Data.List as L
@@ -51,21 +52,30 @@ import           OrgMode.Sayable.Defs
 type ReverseSectionNumbering = [Int]
 -- the array of ints is the reverse order current nested section numbering
 
-data SectionLevel a = SectionLvl ReverseSectionNumbering a
+data SectionLevel a = SectionLvl
+                      ReverseSectionNumbering
+                      (Maybe [OrgText]) -- subtitle
+                      a
   deriving Functor
 
 
 slEmptyWrap :: a -> SectionLevel a
-slEmptyWrap = SectionLvl mempty
+slEmptyWrap = SectionLvl mempty Nothing
 
 slItem :: SectionLevel a -> a
-slItem (SectionLvl _ a) = a
+slItem (SectionLvl _ _ a) = a
 
 slAddLevel :: Int -> SectionLevel a -> SectionLevel a
-slAddLevel n (SectionLvl ns a) = SectionLvl (n:ns) a
+slAddLevel n (SectionLvl ns st a) = SectionLvl (n:ns) st a
 
 slLevel :: SectionLevel a -> [Int] -- forward ordered
-slLevel (SectionLvl l _) = L.reverse l
+slLevel (SectionLvl l _ _) = L.reverse l
+
+slSubtitle :: SectionLevel a -> Maybe [OrgText]
+slSubtitle (SectionLvl _ st _) = st
+
+-- slRewrap :: a -> SectionLevel b -> SectionLevel a
+-- slRewrap a (SectionLvl x y _) = SectionLvl x y a
 
 $(return []) -- Make SectionLevel available at the Template Haskell level
 
@@ -87,17 +97,23 @@ instance ( $(sayableSubConstraints $ do ofType ''SectionLevel
                                          paramTH (TH.ConT ''OrgSection))
          ) => Sayable "text-style1" OrgDoc where
   sayable od =
+    let getSubtitle = \case
+          OrgBody_setting s
+            | "SUBTITLE" == (toUpper <$> (DV.vecToString $ getField @"keyword" s))
+            -> Just $ orgMarkupParseLine $ getField @"values" s
+          _ -> Nothing
+        subtitle = asum (getSubtitle <$> (DV.toList $ getField @"body" od))
     -- show od &<
-    if null $ DV.toList $ getField @"sections" od
-    then sayable @"text-style1"
-         $ SectionLvl mempty Nothing (getField @"body" od) &< ""
-    else if null $ DV.toList $ getField @"body" od
-         then sayable @"text-style1"
-              $ SectionLvl mempty Nothing (getField @"sections" od) &< ""
-         else SectionLvl mempty Nothing (getField @"body" od)
-              &< ""
-              &< SectionLvl mempty Nothing (getField @"sections" od)
-              &< ""
+    in if null $ DV.toList $ getField @"sections" od
+       then sayable @"text-style1"
+            $ SectionLvl mempty subtitle (getField @"body" od) &< ""
+       else if null $ DV.toList $ getField @"body" od
+            then sayable @"text-style1"
+                 $ slEmptyWrap (getField @"sections" od) &< ""
+            else SectionLvl mempty subtitle (getField @"body" od)
+                 &< ""
+                 &< slEmptyWrap (getField @"sections" od)
+                 &< ""
 
 
 
@@ -127,7 +143,7 @@ instance ( Sayable "text-style1" (SectionLevel OrgBody)
               -- n.b. since some settings are not applied, break the newline
               -- general rule and be explicit here when appropriate.
               let kw = fmap toUpper $ DV.vecToString $ getField @"keyword" setting
-              in if kw `elem` [ "TITLE", "SUBTITLE", "AUTHOR", "EMAIL" ]
+              in if kw `elem` [ "TITLE", "AUTHOR", "EMAIL" ]
                  then a &< b
                  else a  -- drop b, it's probably blank (see Sayable OrgBody)
             _ -> withBlankLine a b
@@ -238,9 +254,13 @@ instance ( Sayable "text-style1" OrgBody
           "EMAIL" -> centerLine 70
                      $ orgMarkupParseLine (getField @"values" setting)
           "TITLE" -> let ttl = orgMarkupParseLine $ getField @"values" setting
-                         ttllen = displayLength ttl
+                         ttllen = max (displayLength ttl)
+                                  $ case slSubtitle sl of
+                                      Nothing -> 0
+                                      Just st -> displayLength st
                      in centerLine 70 (replicate ttllen '━')
                         &< centerLine 70 ttl
+                        &<? (centerLine 70 <$> slSubtitle sl)
                         &< centerLine 70 (replicate ttllen '━')
           _ -> blank
 

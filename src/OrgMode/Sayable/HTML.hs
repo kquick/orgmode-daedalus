@@ -50,17 +50,27 @@ import           Prelude hiding ( lines )
 instance ( $(sayableSubConstraints $ ofType ''OrgDoc >> tagSym "html")
          ) => Sayable "html" OrgDoc where
   sayable od =
-    "<html xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"en\" xml:lang=\"en\">"
-    &< "<head>"
-    &< (DV.fromList $ L.filter isSetting $ DV.toList $ getField @"body" od)
-    &< "</head>"
-    &< "<body>"
-    -- show od &<
-    &< (DV.fromList $ L.filter (not . isSetting) $ DV.toList $ getField @"body" od)
-    &< getField @"sections" od
-    &< "</body>"
-    &< "</html>"
-    &< ""
+    let get f = \case
+          OrgBody_setting s
+            | f == (toUpper <$> (DV.vecToString $ getField @"keyword" s))
+            -> Just $ orgMarkupParseLine $ getField @"values" s
+          _ -> Nothing
+        subtitle = asum (get "SUBTITLE" <$> (DV.toList $ getField @"body" od))
+        title = asum (get "TITLE" <$> (DV.toList $ getField @"body" od))
+    in
+      "<html xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"en\" xml:lang=\"en\">"
+      &< "<head>"
+      &< (DV.fromList $ L.filter isSetting $ DV.toList $ getField @"body" od)
+      &< "</head>"
+      &< "<body>"
+      &<? (("<h1 class=\"title\">" &+) . (&+ "</h1>") <$> title)
+      &<? (("<br/><span class=\"subtitle\">" &+) . (&+ "</span>") <$> subtitle)
+      -- show od &<
+      &< (DV.fromList $ L.filter (not . isSetting) $ DV.toList $ getField @"body" od)
+      &< getField @"sections" od
+      &< "</body>"
+      &< "</html>"
+      &< ""
 
 
 ----------------------------------------------------------------------
