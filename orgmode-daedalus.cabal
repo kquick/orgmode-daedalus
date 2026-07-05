@@ -1,6 +1,6 @@
 cabal-version:      3.0
 name:               orgmode-daedalus
-version:            0.1.0.0
+version:            0.1.1.0
 synopsis:           Parser/printer for Emacs Org-Mode using Daedalus.
 description:
    Parser and pretty-printer for the Org-Mode document format.
