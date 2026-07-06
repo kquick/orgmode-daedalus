@@ -107,6 +107,16 @@
             }:
     rec
       {
+        apps = levers.eachSystem (s:
+          rec
+          {
+            orgmode = {
+              type = "app";
+              program = "${self.packages.${s}.orgmode-daedalus.ghc910}/bin/orgmode";
+            };
+            default = orgmode;
+          });
+
         devShells = levers.haskellShells
           { inherit nixpkgs;
             flake = self;
