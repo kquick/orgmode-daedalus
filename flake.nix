@@ -114,6 +114,10 @@
               type = "app";
               program = "${self.packages.${s}.orgmode-daedalus.ghc910}/bin/orgmode";
             };
+            daedalus = {
+              type = "app";
+              program = "${self.packages.${s}.daedalus.ghc910}/bin/daedalus";
+            };
             default = orgmode;
           });
 
