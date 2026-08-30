@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE TypeApplications #-}
 
@@ -65,7 +66,16 @@ main = do args <- customExecParser (prefs showHelpOnError) opts
                       Just f -> writeFile (T.unpack $ nameText f) out
     opts = (info
              (params
+#if MIN_VERSION_optparse_applicative(0,17,1)
                <**> simpleVersioner ('v':showVersion version)
+#else
+               <**> (infoOption ('v':showVersion version)
+                     $ mconcat [ long "version"
+                               , help "Show version information"
+                               , hidden
+                               ]
+                    )
+#endif
                <**> helper
              )
              ((fullDesc
