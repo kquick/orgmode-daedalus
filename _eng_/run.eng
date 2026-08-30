@@ -25,6 +25,7 @@ dev =
           * GHC 8.10 in nixpkgs does not have effectful-core which was only
             introduced in 2022 (circa GHC 9.2).
         exec =
+          set -e
           echo :::: orgmode-daedalus ghc92
           nix build --no-link .#orgmode-daedalus.ghc92 --override-input nixpkgs github:nixos/nixpkgs/23.05
           echo :::: orgmode-daedalus ghc94
@@ -34,6 +35,7 @@ dev =
       Uses nix to build with recent GHC versions
         in dir = {TopDir}
         exec =
+          set -e
           echo :::: orgmode-daedalus ghc96
           nix build --no-link .#orgmode-daedalus.ghc96 --override-input nixpkgs github:nixos/nixpkgs/24.11
           echo :::: orgmode-daedalus ghc98
