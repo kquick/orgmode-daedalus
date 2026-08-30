@@ -85,7 +85,7 @@ test-suite orgmode-daedalus-test
     other-modules:    TestOrgMode
     build-depends:    base
                     , exceptions
-                    , hspec >= 2.10 && < 2.12
+                    , hspec >= 2.9 && < 2.12
                     , HUnit >= 1.6 && < 1.7
                     , named-text
                     , orgmode-daedalus
