@@ -49,6 +49,7 @@ library
                       OrgMode.Sayable.HTML
     -- other-extensions:
     build-depends:    base >=4.10 && <4.23
+                    , bytestring
                     , diagnose >= 2.5 && < 2.6
                     , daedalus >= 0.1 && < 1.1
                     , named-text >= 1.2.4 && < 1.3

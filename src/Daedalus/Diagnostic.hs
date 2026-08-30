@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE LambdaCase #-}
@@ -15,15 +16,25 @@ where
 
 import           Daedalus.RTS ( ParseError(..), inputOffset, inputLength )
 import qualified Daedalus.RTS.Vector as DV
+import           Data.ByteString ( ByteString )
 import           Data.Function ( on )
 import           Data.Maybe ( catMaybes )
 import           Data.Name
 import           Data.Text ( Text )
 import qualified Data.Text as T
-import           Data.Text.Encoding ( decodeUtf8Lenient )
 import           Error.Diagnose
 import           Prettyprinter ( Pretty, Doc, reAnnotate )
 import           Text.Sayable
+
+#if MIN_VERSION_text(2,0,0)
+import           Data.Text.Encoding ( decodeUtf8Lenient )
+decodeUtf8Text :: ByteString -> Text
+decodeUtf8Text = decodeUtf8Lenient
+#else
+import Data.Text.Encoding ( decodeUtf8With )
+decodeUtf8Text :: ByteString -> Text
+decodeUtf8Text = decodeUtf8With (\_ _ -> Just '?')
+#endif
 
 
 -- | A helper function to convert a Daedalus ParseError into a Diagnostic Report.
@@ -63,7 +74,7 @@ daedalusDiagnostic opErr inpFrom inptxt pe =
       inpTo = computeLC True $ loc + (min maxLen lEn)
       pos = Position inpFrm inpTo (T.unpack $ nameText inpFrom)
       posmarks = catMaybes
-                 [ Just ( pos, This $ decodeUtf8Lenient $ DV.vecToRep $ peMsg pe )
+                 [ Just ( pos, This $ decodeUtf8Text $ DV.vecToRep $ peMsg pe )
                  , if T.null (peLoc pe)
                    then Nothing
                    else Just ( pos, Where $ peLoc pe )
