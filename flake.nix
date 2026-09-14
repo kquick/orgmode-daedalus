@@ -145,27 +145,32 @@
                 inherit daedalus-core daedalus-utils daedalus-value daedalus-vm
                   rts-hs rts-hs-data parameterized-utils alex-tools;
               };
-              daedalus-core = mkHaskell "daedalus-core" "${daedalus-src}/daedalus-core" {
-                inherit bv-sized daedalus-utils daedalus-value
-                  rts-hs rts-hs-data rts-vm-hs parameterized-utils;
-              };
-              daedalus-vm = mkHaskell "daedalus-vm" "${daedalus-src}/daedalus-vm" {
-                inherit daedalus-core daedalus-utils daedalus-value
-                  language-rust
-                  rts-vm-hs;
-              };
-              daedalus-utils = mkHaskell "daedalus-utils" "${daedalus-src}/daedalus-utils" {
-                inherit alex-tools;
-              };
-              daedalus-value = mkHaskell "daedalus-value" "${daedalus-src}/daedalus-value" {
-                inherit daedalus-utils rts-hs rts-hs-data;
-              };
+              daedalus-core =
+                mkHaskell "daedalus-core" "${daedalus-src}/daedalus-core" {
+                  inherit bv-sized daedalus-utils daedalus-value
+                    rts-hs rts-hs-data rts-vm-hs parameterized-utils;
+                };
+              daedalus-vm =
+                mkHaskell "daedalus-vm" "${daedalus-src}/daedalus-vm" {
+                  inherit daedalus-core daedalus-utils daedalus-value
+                    language-rust
+                    rts-vm-hs;
+                };
+              daedalus-utils =
+                mkHaskell "daedalus-utils" "${daedalus-src}/daedalus-utils" {
+                  inherit alex-tools;
+                };
+              daedalus-value =
+                mkHaskell "daedalus-value" "${daedalus-src}/daedalus-value" {
+                  inherit daedalus-utils rts-hs rts-hs-data;
+                };
               language-rust = mkHaskell "language-rust" language-rust-src {};
               microlens = mkHaskell "microlens" "${microlens-src}/microlens" {};
               rts-hs = mkHaskell "rts-hs" "${daedalus-src}/rts-hs" {
                 inherit rts-hs-data;
               };
-              rts-hs-data = mkHaskell "rts-hs-data" "${daedalus-src}/rts-hs-data" {};
+              rts-hs-data =
+                mkHaskell "rts-hs-data" "${daedalus-src}/rts-hs-data" {};
               rts-vm-hs = mkHaskell "rts-vm-hs" "${daedalus-src}/rts-vm-hs" {
                 inherit rts-hs-data;
               };
