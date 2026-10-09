@@ -110,6 +110,8 @@
         apps = levers.eachSystem (s:
           rec
           {
+            default = orgmode;
+            depmgr = levers.apps.${s}.depmgr;
             orgmode = {
               type = "app";
               program = "${self.packages.${s}.orgmode-daedalus.ghc910}/bin/orgmode";
@@ -118,7 +120,6 @@
               type = "app";
               program = "${self.packages.${s}.daedalus.ghc910}/bin/daedalus";
             };
-            default = orgmode;
           });
 
         devShells = levers.haskellShells
@@ -165,7 +166,7 @@
                   inherit daedalus-utils rts-hs rts-hs-data;
                 };
               language-rust = mkHaskell "language-rust" language-rust-src {};
-              microlens = mkHaskell "microlens" "${microlens-src}/microlens" {};
+              microlens = named-text.packages."${system}".microlens;
               rts-hs = mkHaskell "rts-hs" "${daedalus-src}/rts-hs" {
                 inherit rts-hs-data;
               };
@@ -191,8 +192,7 @@
                       '';
                   });
               };
-              parameterized-utils = mkHaskell "parameterized-utils"
-                parameterized-utils-src { inherit microlens; };
+              parameterized-utils = named-text.packages."${system}".parameterized-utils;
               orgmode-daedalus = mkHaskell "orgmode-daedalus" self {
                 inherit
                   daedalus

@@ -4,28 +4,37 @@ dev =
       Builds the project
         exec = cabal build orgmode-daedalus
 
-    update_nix_derivs =
-      Update local static nix derivations
-        in dir = {TopDir}/nix
+    update_deps =
+      Update all dependencies =
+        in dir = {TopDir}
+        exec = nix run .#depmgr flake_update
+
+    update_deps:local =
+      Update local development dependencies =
+        needs = build:nix-deriv
+        in dir = {TopDir}
         exec = |
           set -e
-          mkDeriv () { echo :::: Github $1 / $2 derivation generation; nix run nixpkgs#cabal2nix -- https://github.com/${1}/${2} --revision=$(nix flake metadata --json | nix run nixpkgs#jq -- -r --arg SRC "${2}-src" '.locks.nodes.[$SRC].locked.rev') > ${2}.nix; }
-          mkDerivD () { echo :::: Daedalus $1 derivation generation; nix run nixpkgs#cabal2nix https://github.com/GaloisInc/daedalus -- --subpath=$1 --revision=$(nix flake metadata --json | nix run nixpkgs#jq -- -r --arg SRC "${1}" '.locks.nodes.["daedalus-src"].locked.rev') > ${1}.nix; }
-          nix run nixpkgs#cabal2nix .. > orgmode-daedalus.nix
-          mkDeriv mesabloo diagnose
-          mkDeriv GaloisInc alex-tools
-          mkDeriv GaloisInc bv-sized
-          mkDeriv GaloisInc language-rust
-          mkDeriv GaloisInc parameterized-utils
-          mkDeriv GaloisInc daedalus
-          mkDerivD daedalus-core
-          mkDerivD daedalus-vm
-          mkDerivD daedalus-utils
-          mkDerivD daedalus-value
-          mkDerivD rts-hs
-          mkDerivD rts-hs-data
-          mkDerivD rts-vm-hs
-          nix run nixpkgs#cabal2nix https://github.com/monadfix/microlens -- --subpath=microlens --revision=$(nix flake metadata --json | nix run nixpkgs#jq '.locks.nodes."microlens-src".locked.rev' | sed -e 's,",,g') > microlens.nix
+          nix run .#depmgr flake_update kquick
+          nix run .#depmgr flake_update galoisinc
+          nix run .#depmgr flake_update mesabloo
+          nix run .#depmgr cabal2nix ./nix diagnose-src
+          nix run .#depmgr cabal2nix ./nix alex-tools-src
+          nix run .#depmgr cabal2nix ./nix bv-sized-src
+          nix run .#depmgr cabal2nix ./nix language-rust-src
+          nix run .#depmgr cabal2nix ./nix daedalus-src
+          nix run .#depmgr cabal2nix ./nix daedalus-src daedalus-core
+          nix run .#depmgr cabal2nix ./nix daedalus-src daedalus-vm
+          nix run .#depmgr cabal2nix ./nix daedalus-src daedalus-utils
+          nix run .#depmgr cabal2nix ./nix daedalus-src daedalus-value
+          nix run .#depmgr cabal2nix ./nix daedalus-src rts-hs
+          nix run .#depmgr cabal2nix ./nix daedalus-src rts-hs-data
+          nix run .#depmgr cabal2nix ./nix daedalus-src rts-vm-hs
+
+    build:nix-deriv
+      Builds local (cached) derivation
+        in dir = {TopDir}/nix
+        exec = nix run nixpkgs#cabal2nix .. > orgmode-daedalus.nix
 
     flake_update =
       Update flake dependencies =
