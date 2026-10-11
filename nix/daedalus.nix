@@ -10,9 +10,9 @@ mkDerivation {
   pname = "daedalus";
   version = "1.0";
   src = fetchgit {
-    url = "https://github.com/GaloisInc/daedalus";
-    sha256 = "0wi31zy84gl5v8fjinhmlwf9gsnbkzdsij9lvns15v8b5jds5xsk";
-    rev = "443c848a62a90a57cb7b8a02e8b2a1b83581affc";
+    url = "https://github.com/galoisinc/daedalus";
+    sha256 = "15mn9lbalpq57q7mln0815m28lipdvfcnv7hsi4kb61ccj6ybgvx";
+    rev = "a4ad7592ef2449fa1da07d2827fc6684293d21ca";
     fetchSubmodules = true;
   };
   isLibrary = true;

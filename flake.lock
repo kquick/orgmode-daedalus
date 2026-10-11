@@ -35,11 +35,11 @@
     "daedalus-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1787171733,
-        "narHash": "sha256-U/eimywL7RK03TTJqNufy+qXHKcV2igd2oU+gvwPI3I=",
+        "lastModified": 1790894523,
+        "narHash": "sha256-fb/ljWQsmDVJ1PBsy9xuN1IkagkIWFoPPgVfqhZNtpY=",
         "owner": "galoisinc",
         "repo": "daedalus",
-        "rev": "443c848a62a90a57cb7b8a02e8b2a1b83581affc",
+        "rev": "a4ad7592ef2449fa1da07d2827fc6684293d21ca",
         "type": "github"
       },
       "original": {
