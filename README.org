@@ -79,8 +79,10 @@ entirely within each individual structural element via a separate library call.
 **** ASCII-specific [20%]
      - Neither the ~"text"~ nor the ~"text-style1"~ output modes generate a table
        of contents.
-     - The ~"text-style1" shows the author below the bottom header separator line
+     - The ~"text-style1"~ shows the author below the bottom header separator line
        rather than within the header separator lines.
+     - The ~"text-style1"~ does not have extra lines before section headers that
+       appear in the emacs mode.
 ***** DONE Quoting ASCII text
 ***** TODO section-to-list level
 ***** TODO ATTR_ASCII

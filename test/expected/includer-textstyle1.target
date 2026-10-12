@@ -1,0 +1,179 @@
+                             ━━━━━━━━━━━━
+                             Org Includer
+                             ━━━━━━━━━━━━
+                                 ━━━━
+                                 Info
+                                 ━━━━
+
+This is a document
+
+1 Main Section
+══════════════
+
+  This is the main section
+
+1.1 Subsection 1
+────────────────
+
+  The first subsection
+
+1.2 Subsection 2
+────────────────
+
+  This is the second subsection.
+
+  This is included from the include file.
+
+1.2.1 Include Sub1
+╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌
+
+  First subsection of inclusion. By default this is "indented"
+  underneath the parent where the include occurred, so while this is a
+  level 1 section in this include file, it was included from a level 2
+  section and therefore becomes a subsection of that level 2 section (a
+  level 3 section).
+
+◊ 1.2.1.1 Include Sub2
+
+  Sub-subsection of included file. Note that this is the last line, but
+  the parent file will continue with this nesting (the include acts as a
+  paste, not a sub-parse).
+
+  This is back in the main file, but the paragraph is "continued" from
+  where the included file left-off (a level 4 section). However, another
+  include statement is relative to the _host_ file include statements,
+  so the first level 1 in both the `inc1.org' above and
+  the `inc2.org' below will be at level 3, which is 1 level deeper than
+  this Subsection 2.
+
+  First line of inc2.
+
+
+2 S1 in Inc2a
+═════════════
+
+  This is the first section in an include of an include. The sections
+  continue to nest, but includes within an include are fine.
+
+2.1 S1.1 in Inc2
+────────────────
+
+  It creates a subsection
+
+  • with a list
+  • of multiple elements
+    • another list element, but this is the first one in an include file
+      statement that is itself indented in a list, so this is treated as
+      a sub-list.
+    • this is in a sublist and not at the top level.
+
+
+2.1.1 SECTION
+╌╌╌╌╌╌╌╌╌╌╌╌╌
+
+  Here is a section!  Due to the inclusion path, it goes even deeper
+  (now at level 8).
+  • where one of the elements has an include
+
+
+2.1.2 S1.1.1 in Inc2
+╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌
+
+  Back in the first-level include file, as a subsection.  This is a
+  subsection at the level of the *current* file and not where the
+  included file "inc2a_in_list.org" above left us.
+
+  This include file ends here.
+
+  Third para of inc2.
+
+
+2.1.3 S1
+╌╌╌╌╌╌╌╌
+
+  This is another included file.
+
+
+◊ 2.1.3.1 S1.1
+
+  With another subsection
+
+
+  ◊ 2.1.3.1.1 S1.1.1
+
+    That goes deep
+
+
+    ◊ 2.1.3.1.1.1 S1 in Inc2b file
+
+      This is the first section in the second included file in an
+      included file.  Once again, this is relative to the file that
+      included us (a sub-include), so this should be the same level as
+      the "S1 in Inc2a" section.
+
+
+      ◊ 2.1.3.1.1.1.1 S1.1 in Inc2b file
+
+        And this is its subsection and last line in this file.
+
+        This is inc2_c, with a minlevel 1 inclusion.
+
+
+3 Section in inc2_c
+═══════════════════
+
+  This will be a true level 1 section.  Even though this got included by
+  another include file who's level one sections were actually at level
+  3, the `:minlevel 1' directive provides an *absolute* section level,
+  not a relative one.
+
+  But, not all is as it seems!  When this file is done, the file that
+  included it has another section (level 2 in that file, which is level
+  4 overall), and… it is at *level 4*, although the section numbering
+  puts it as a 4th level subsection underneath this level 1 primary
+  section!
+
+
+◊ 3.0.0.1 S1.2
+
+  And back up to the include levels here.
+
+  Third include file here
+
+
+4 S1 in Inc3
+════════════
+
+  • This is fun
+  • (When it works)
+  • This should be a level 1 section for the entire output.
+
+
+5 TODO Missing
+══════════════
+
+  A missing include file causes an error.
+
+  ##+INCLUDE: "./incdir/missing.org"
+
+  • TODO :lines ranges
+  • TODO ::section searching
+  • TODO :only-contents
+
+
+6 Overall rules
+═══════════════
+
+  1. The beginning/default portion of a file continues the most previous
+     section, whether it was in a parent or child inclusion.
+  2. Nested includes are relative to the nesting level, but sequenced
+     includes are relative to the current file (although see rule 1).
+  3. minlevel is absolute for the file it includes, although the section
+     nesting will return to the place it was when the include ends
+     (although subsequent sections in the including file will be nested
+     under the included file).
+  4. Metadata like `#+TITLE' and `#+AUTHOR' are concatenated (this is
+     the same as if there were multiple metadata elements in the same
+     file: i.e. inclusion has no effect).
+  5. Relative paths specified in `#+INCLUDE:' directives are relative to
+     the file they are contained in.

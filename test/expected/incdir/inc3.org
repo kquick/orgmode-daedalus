@@ -1,0 +1,7 @@
+Third include file here
+
+* S1 in Inc3
+
+- This is fun
+- (When it works)
+- This should be a level 1 section for the entire output.

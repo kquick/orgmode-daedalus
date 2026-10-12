@@ -1,0 +1,14 @@
+This is included from the include file.
+
+* Include Sub1
+
+First subsection of inclusion.  By default this is "indented" underneath the
+parent where the include occurred, so while this is a level 1 section in this
+include file, it was included from a level 2 section and therefore becomes a
+subsection of that level 2 section (a level 3 section).
+
+** Include Sub2
+
+Sub-subsection of included file.  Note that this is the last line, but the parent
+file will continue with this nesting (the include acts as a paste, not a
+sub-parse).

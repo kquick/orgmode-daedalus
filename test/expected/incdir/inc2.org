@@ -1,0 +1,25 @@
+First line of inc2.
+
+#+INCLUDE: "inc2_a.org"
+
+Third para of inc2.
+
+* S1
+
+This is another included file.
+
+** S1.1
+
+With another subsection
+
+*** S1.1.1
+
+That goes deep
+
+#+INCLUDE: "inc2_b.org"
+
+#+INCLUDE: "incsub/inc2_c.org" :minlevel 1
+
+** S1.2
+
+And back up to the include levels here.

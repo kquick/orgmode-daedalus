@@ -1,0 +1,21 @@
+* S1 in Inc2a
+
+This is the first section in an include of an include.  The sections continue to
+nest, but includes within an include are fine.
+
+** S1.1 in Inc2
+
+It creates a subsection
+
+  - with a list
+  - of multiple elements
+    #+INCLUDE: "inc2a_in_list.org"
+  - where one of the elements has an include
+
+*** S1.1.1 in Inc2
+
+  Back in the first-level include file, as a subsection.  This is a subsection at
+  the level of the *current* file and not where the included file
+  "inc2a_in_list.org" above left us.
+
+This include file ends here.

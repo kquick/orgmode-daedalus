@@ -1,0 +1,8 @@
+- another list element, but this is the first one in an include file statement
+  that is itself indented in a list, so this is treated as a sub-list.
+- this is in a sublist and not at the top level.
+
+* SECTION
+
+Here is a section!  Due to the inclusion path, it goes even deeper (now at level
+8).

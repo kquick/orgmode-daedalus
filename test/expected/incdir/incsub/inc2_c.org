@@ -1,0 +1,12 @@
+This is inc2_c, with a minlevel 1 inclusion.
+
+* Section in inc2_c
+
+This will be a true level 1 section.  Even though this got included by another
+include file who's level one sections were actually at level 3, the ~:minlevel 1~
+directive provides an *absolute* section level, not a relative one.
+
+But, not all is as it seems!  When this file is done, the file that included it
+has another section (level 2 in that file, which is level 4 overall), and... it
+is at *level 4*, although the section numbering puts it as a 4th level subsection
+underneath this level 1 primary section!

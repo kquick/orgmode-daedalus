@@ -1,0 +1,61 @@
+#+TITLE: Org Includer
+#+TITLE: Info
+
+This is a document
+
+* Main Section
+
+This is the main section
+
+** Subsection 1
+
+The first subsection
+
+** Subsection 2
+
+This is the second subsection.
+
+#+INCLUDE: "./incdir/inc1.org"
+
+This is back in the main file, but the paragraph is "continued" from where the
+included file left-off (a level 4 section).  However, another include statement
+is relative to the _host_ file include statements, so the first level 1 in both
+the ~inc1.org~ above and the ~inc2.org~ below will be at level 3, which is 1
+level deeper than this Subsection 2.
+
+#+include: "incdir/inc2.org"
+
+#+INCLUDE: "./incdir/inc3.org" :minlevel 1
+
+* TODO Missing
+
+A missing include file causes an error.
+
+##+INCLUDE: "./incdir/missing.org"
+
+ - TODO :lines ranges
+ - TODO ::section searching
+ - TODO :only-contents
+
+* Overall rules
+
+1. Metadata like ~#+TITLE~ and ~#+AUTHOR~ are concatenated (this is the same as
+   if there were multiple metadata elements in the same file: i.e. inclusion has
+   no effect).
+2. Relative paths specified in ~#+INCLUDE:~ directives are relative to the file
+   they are contained in.
+
+
+
+1. Any OrgBody following an include is appended to the end of the last OrgBody in
+   the included file.
+2. Any include following another include in the same OrgBody will start at the
+   same level (even though the orgbody was relocated).
+3. Any first OrgBody block in an include is appended to the OrgBody where its include
+   statement occurred.
+4. Any include in the first block occurs at level 0.
+
+5. minlevel is absolute for the file it includes, although the section nesting
+   will return to the place it was when the include ends (although subsequent
+   sections in the including file will be nested under the included file).
+6. Rule #3 still holds even with a minlevel specification.

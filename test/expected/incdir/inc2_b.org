@@ -1,0 +1,12 @@
+#+TITLE: included-title
+#+AUTHOR: somebody
+
+* S1 in Inc2b file
+
+This is the first section in the second included file in an included file.  Once
+again, this is relative to the file that included us (a sub-include), so this
+should be the same level as the "S1 in Inc2a" section.
+
+** S1.1 in Inc2b file
+
+And this is its subsection and last line in this file.
