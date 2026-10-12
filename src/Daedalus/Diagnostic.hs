@@ -14,7 +14,11 @@ module Daedalus.Diagnostic
   )
 where
 
-import           Daedalus.RTS ( ParseError(..), inputOffset, inputLength )
+import           Daedalus.RTS ( ParseError(..), inputOffset, inputLength
+                              , contextEntries
+                              , ParserContextEntry( ParserContextEntry
+                                                  , ParserContextOmitted)
+                              )
 import qualified Daedalus.RTS.Vector as DV
 import           Data.ByteString ( ByteString )
 import           Data.Function ( on )
@@ -45,7 +49,19 @@ daedalusDiagnostic :: Name "operation error"
                    -> Diagnostic Text
 daedalusDiagnostic opErr inpFrom inptxt pe =
   let maxLen = 1024 -- maximum # input characters to show.
-      notes = concatMap (fmap Note) $ peStack pe
+      notes :: [Note Text]
+      notes = concat $ parseErrStackToNotes $ peStack pe
+      -- notes = concatMap (fmap Note) $ peStack pe
+      parseErrStackToNotes =
+        let pEntry = \case
+              ParserContextEntry lbl count
+                | count > 1 -> Note $ T.pack $ sez @"error"
+                               $ lbl &- '(' &+ count &- t'"times)"
+                | otherwise -> Note lbl
+              ParserContextOmitted count ->
+                Note $ T.pack $ sez @"error"
+                $ t'"..." &- '(' &+ count &- t'"tail calls omitted)"
+        in fmap (fmap pEntry . contextEntries)
       loc = inputOffset $ peInput pe
       lEn = inputLength $ peInput pe
       lTx = nameText inptxt
