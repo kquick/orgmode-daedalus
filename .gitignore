@@ -43,7 +43,7 @@ _darcs
 .boring
 *~
 
-doc/internal
+# doc/internal
 default.nix
 
 .cmd_history
@@ -54,6 +54,8 @@ default.nix
 test/examples/*/out
 test/expected/*.txt
 test/expected/*.html
+
+junk
 
 # MacOS
 .DS_Store
