@@ -2,6 +2,19 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeApplications #-}
 
+{- |
+Module       : OrgMode.Include
+Description  : Template haskell inclusing of parsed OrgMode documents into haskell programs
+Copyright    : (c) 2026, Kevin Quick
+License      : BSD3
+Stability    : provisional
+Portability  : portable
+
+This module provides the ability to embed a parsed org-mode document directly
+into a haskell program.
+
+-}
+
 module OrgMode.Include
   (
     includeOrgInSource
