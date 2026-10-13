@@ -29,6 +29,7 @@ module OrgMode.Sayable.HTML
   )
 where
 
+import           Control.Applicative ( (<|>) )
 import           Data.Bool ( bool )
 import           Data.Char ( chr, toUpper )
 import           Data.Foldable
@@ -58,16 +59,30 @@ instance ( $(sayableSubConstraints $ ofType ''OrgDoc >> tagSym "html")
         subtitle = asum (get "SUBTITLE" <$> (DV.toList $ getField @"body" od))
         title = asum (get "TITLE" <$> (DV.toList $ getField @"body" od))
     in
-      "<html xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"en\" xml:lang=\"en\">"
+      "<?xml version=\"1.0\" encoding=\"utf-8\"?>"
+      &< "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\""
+      &< "\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">"
+      &< "<html xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"en\" xml:lang=\"en\">"
       &< "<head>"
+      &< "<meta http-equiv=\"Content-Type\" content=\"text/html;charset=utf-8\" />"
+      &< "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />"
       &< (DV.fromList $ L.filter isSetting $ DV.toList $ getField @"body" od)
       &< "</head>"
       &< "<body>"
-      &<? (("<h1 class=\"title\">" &+) . (&+ "</h1>") <$> title)
-      &<? (("<br/><span class=\"subtitle\">" &+) . (&+ "</span>") <$> subtitle)
+      &< "<div id=\"content\" class=\"content\">"
+      &+ maybe ("" &+ "")
+         (\_ -> ""
+                &< "<h1 class=\"title\">"
+                &+? title
+                &< "<br />"
+                &<? (("<span class=\"subtitle\">" &+) . (&+ "</span>") <$> subtitle)
+                &< "</h1>"
+         )
+         (title <|> subtitle)
       -- show od &<
       &< (DV.fromList $ L.filter (not . isSetting) $ DV.toList $ getField @"body" od)
       &< getField @"sections" od
+      &< "</div>" -- content
       &< "</body>"
       &< "</html>"
       &< ""
