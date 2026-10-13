@@ -136,6 +136,7 @@ The End
 :PROPERTIES:
 :CUSTOM_ID: h:3cc0ee74-8b95-4e30-9629-4cd34391edb1
 :END:
+    This section is not emitted by emacs text exporting!
 *** TODO Comments
 :PROPERTIES:
 :CUSTOM_ID: h:010471d1-07b4-47e4-a925-738102cdd681

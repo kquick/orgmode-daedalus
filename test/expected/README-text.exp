@@ -110,6 +110,9 @@ Testing Validation Document
 
 *** TODO Footnotes
 
+  This section is not emitted by emacs text exporting!
+
+
 
 *** TODO Comments
 

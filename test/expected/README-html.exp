@@ -122,6 +122,9 @@ The End
 
 <h3><span class="TODO TODO-TODO">TODO</span> Footnotes</h3>
 
+<p>
+This section is not emitted by emacs text exporting!
+</p>
 
 <h3><span class="TODO TODO-TODO">TODO</span> Comments</h3>
 
