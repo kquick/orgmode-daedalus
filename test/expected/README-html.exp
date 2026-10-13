@@ -25,7 +25,7 @@
 <span class="subtitle">Testing Validation Document</span>
 </h1>
 
-<h1>orgmode-daedalus</h1>
+<h2>orgmode-daedalus</h2>
 
 <p>
 A parser and pretty-printer for the <a href="https://orgmode.org">Org-Mode</a> document format.
@@ -42,32 +42,32 @@ generation of C, C++, and Rust parsers as well).
 Development and usage is supported by the <a href="https://github.com/GaloisInc/eng">eng</a> tool. Install this tool and type <span class="code">eng</span> in this directory for more information.
 </p>
 
-<h1>OrgMode support details</h1>
+<h2>OrgMode support details</h2>
 
 <p>
 Note that structural and markup parsing are distinct operations: markup is parsed
 entirely within each individual structural element.
 </p>
-<h2>Structural parsing [41%]</h2>
+<h3>Structural parsing [41%]</h3>
 
-<h3>Headers [75%]</h3>
+<h4>Headers [75%]</h4>
 
-<h4><span class="TODO TODO-DONE">DONE</span> text</h4>
-
-
-<h4><span class="TODO TODO-DONE">DONE</span> TODO</h4>
+<h5><span class="TODO TODO-DONE">DONE</span> text</h5>
 
 
-<h4><span class="TODO TODO-DONE">DONE</span> priority</h4>
+<h5><span class="TODO TODO-DONE">DONE</span> TODO</h5>
 
 
-<h4><span class="TODO TODO-TODO">TODO</span> tags</h4>
+<h5><span class="TODO TODO-DONE">DONE</span> priority</h5>
 
 
-<h3><span class="TODO TODO-DONE">DONE</span> paragraphs</h3>
+<h5><span class="TODO TODO-TODO">TODO</span> tags</h5>
 
 
-<h3><span class="TODO TODO-DONE">DONE</span> lists</h3>
+<h4><span class="TODO TODO-DONE">DONE</span> paragraphs</h4>
+
+
+<h4><span class="TODO TODO-DONE">DONE</span> lists</h4>
 
 <ul>
 <li>splat</li>
@@ -82,10 +82,10 @@ entirely within each individual structural element.
 </ul></li>
 </ul>
 
-<h3><span class="TODO TODO-DONE">DONE</span> link</h3>
+<h4><span class="TODO TODO-DONE">DONE</span> link</h4>
 
 
-<h3><span class="TODO TODO-DONE">DONE</span> Blocks</h3>
+<h4><span class="TODO TODO-DONE">DONE</span> Blocks</h4>
 
 <blockquote>
 <p>
@@ -122,65 +122,65 @@ I feel inspected,<br/>
 The End
 </div>
 
-<h3><span class="TODO TODO-DONE">DONE</span> Settings</h3>
+<h4><span class="TODO TODO-DONE">DONE</span> Settings</h4>
 
 
-<h3><span class="TODO TODO-TODO">TODO</span> Tables</h3>
+<h4><span class="TODO TODO-TODO">TODO</span> Tables</h4>
 
 
-<h3><span class="TODO TODO-TODO">TODO</span> Footnotes</h3>
+<h4><span class="TODO TODO-TODO">TODO</span> Footnotes</h4>
 
 <p>
 This section is not emitted by emacs text exporting!
 </p>
 
-<h3><span class="TODO TODO-TODO">TODO</span> Comments</h3>
+<h4><span class="TODO TODO-TODO">TODO</span> Comments</h4>
 
 
-<h3><span class="TODO TODO-TODO">TODO</span> Horizontal Rules</h3>
+<h4><span class="TODO TODO-TODO">TODO</span> Horizontal Rules</h4>
 
 
-<h3><span class="TODO TODO-TODO">TODO</span> captions</h3>
+<h4><span class="TODO TODO-TODO">TODO</span> captions</h4>
 
 
-<h3><span class="TODO TODO-TODO">TODO</span> dates</h3>
+<h4><span class="TODO TODO-TODO">TODO</span> dates</h4>
 
 <p>
 Note: the TODO state change lines are not indented!
 </p>
 
-<h2>Markup parsing [85%]</h2>
+<h3>Markup parsing [85%]</h3>
 
-<h3><span class="TODO TODO-DONE">DONE</span> bold</h3>
-
-
-<h3><span class="TODO TODO-DONE">DONE</span> underline</h3>
+<h4><span class="TODO TODO-DONE">DONE</span> bold</h4>
 
 
-<h3><span class="TODO TODO-DONE">DONE</span> italic</h3>
+<h4><span class="TODO TODO-DONE">DONE</span> underline</h4>
 
 
-<h3><span class="TODO TODO-DONE">DONE</span> link</h3>
+<h4><span class="TODO TODO-DONE">DONE</span> italic</h4>
 
 
-<h3><span class="TODO TODO-DONE">DONE</span> link target</h3>
+<h4><span class="TODO TODO-DONE">DONE</span> link</h4>
 
 
-<h3><span class="TODO TODO-DONE">DONE</span> radio target</h3>
+<h4><span class="TODO TODO-DONE">DONE</span> link target</h4>
 
 
-<h3><span class="TODO TODO-DONE">DONE</span> strikethrough</h3>
+<h4><span class="TODO TODO-DONE">DONE</span> radio target</h4>
 
 
-<h3><span class="TODO TODO-DONE">DONE</span> verbatim</h3>
+<h4><span class="TODO TODO-DONE">DONE</span> strikethrough</h4>
 
 
-<h3><span class="TODO TODO-TODO">TODO</span> radio target references</h3>
+<h4><span class="TODO TODO-DONE">DONE</span> verbatim</h4>
 
 
-<h1>Alternatives</h1>
+<h4><span class="TODO TODO-TODO">TODO</span> radio target references</h4>
 
-<h2>Parsing</h2>
+
+<h2>Alternatives</h2>
+
+<h3>Parsing</h3>
 
 <ul>
 <li><a href="https://hackage.haskell.org/package/org-mode">org-mode</a>

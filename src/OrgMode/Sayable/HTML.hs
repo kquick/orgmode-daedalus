@@ -130,7 +130,7 @@ instance ( $(sayableSubConstraints $ do ofType ''OrgSection
                                         tagSym "html")
          ) => Sayable "html" OrgSection where
   sayable s = let hdr = orgMarkupParseLine $ getField @"header" s
-                  lvl = asInt $ getField @"level" s
+                  lvl = succ $ asInt $ getField @"level" s
                   tdo = (DV.vecToString <$> getField @"todo" s) >>= \case
                           "TODO" -> Just $ hspan "TODO TODO-TODO" "TODO" &+ ' '
                           "DONE" -> Just $ hspan "TODO TODO-DONE" "DONE" &+ ' '
