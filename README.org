@@ -15,27 +15,52 @@ Development and usage is supported by the [[https://github.com/GaloisInc/eng][en
 * OrgMode support details
 
 Note that structural and markup parsing are distinct operations: markup is parsed
-entirely within each individual structural element.
+entirely within each individual structural element via a separate library call.
+
+** Output modes supported
+
+   - ~"text"~ :: very simple and straightforward conversion of the parsed Org
+     file into text, with very little markup or layout improvements.
+   - ~"text-style1"~ :: an output mode that closely mirrors the emacs utf8 text
+     export style (differences are noted below).
+   - ~"html"~ :: an output mode that closely mirrors the emacs HTML export style
+     (differences are noted below).
 
 ** Structural parsing [41%]
 *** Headers [75%]
 **** DONE text
+     - Note: the emacs text export will elide a section whose title is
+       "Footnotes" in its entirety!  This parser/emitter will not.
 **** DONE TODO
 **** DONE priority
 **** TODO tags
 *** DONE paragraphs
+   - The ~"text-style1"~ output wraps paragraphs at a slightly different location
+     than the emacs version.
+   - The ~"text"~ output wraps text differently, especially in regards to
+     embedded links.
 *** DONE lists
     - splat
     - dash
     - plus
     - enumerated
     - checkboxes
-*** DONE link 
+    - The ~"textstyle1"~ output mode will sometimes add extra blank lines between
+      list elements.  This can result in better list visibility for long
+      (multi-line and multi-paragraph) list elements.
+    - The ~"text"~ output mode will always add blank lines between list elements.
+*** DONE link
+    - The ~"text"~ output does not show link URLs as footers but instead as
+      inline text.
 *** DONE Blocks
 *** DONE Settings
 *** TODO Tables
 *** TODO Properties
 *** TODO Export Settings [26%]
+      - Note that emacs' export of documents with multiple settings will collect
+        all similar settings together and concatenate them with a space
+        separator. The ~"text"~ and ~"text-style1"~ output formats do not collate
+        these settings in this style and instead present them stacked vertically.
 **** DONE AUTHOR
 **** TODO BIND
 **** TODO CREATOR
@@ -52,6 +77,10 @@ entirely within each individual structural element.
 **** TODO SUBTITLE
 **** DONE TITLE
 **** ASCII-specific [20%]
+     - Neither the ~"text"~ nor the ~"text-style1"~ output modes generate a table
+       of contents.
+     - The ~"text-style1" shows the author below the bottom header separator line
+       rather than within the header separator lines.
 ***** DONE Quoting ASCII text
 ***** TODO section-to-list level
 ***** TODO ATTR_ASCII
@@ -66,6 +95,11 @@ entirely within each individual structural element.
 ***** TODO LATEX_CLASS_PRE
 ***** TODO KEYWORDS
 **** HTML-specific [27%]
+     - The ~"html"~ output style does not generate a table of contents.
+     - The ~"html"~ output style does not generate a "postable" division with
+       author, creation date, and validator link.
+     - The ~"html"~ output style does not generate section numbering for
+       sections.
 ***** TODO HTML_DOCTYPE
 ***** TODO HTML_CONTAINER
 ***** TODO HTML_LINK_HOME
