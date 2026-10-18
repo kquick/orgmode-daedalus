@@ -35,11 +35,11 @@
     "daedalus-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1790894523,
-        "narHash": "sha256-fb/ljWQsmDVJ1PBsy9xuN1IkagkIWFoPPgVfqhZNtpY=",
+        "lastModified": 1792016152,
+        "narHash": "sha256-L03QWH0phDmYE+GiO55iwxNRiSB99bIAHQaju+AHdjg=",
         "owner": "galoisinc",
         "repo": "daedalus",
-        "rev": "a4ad7592ef2449fa1da07d2827fc6684293d21ca",
+        "rev": "9afef8242f7289971550ab43d472d284b82766b0",
         "type": "github"
       },
       "original": {
@@ -208,11 +208,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1789264731,
-        "narHash": "sha256-llGJbC0CcU8DfROr6mZjRJgMLQd/SKwfpzxJH/2lHO4=",
+        "lastModified": 1792116957,
+        "narHash": "sha256-EjZqHKObBfIOeHZnMRVV87HB3pPq/WBkmRJWyFxmZu8=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "02f5696b0e6097e589076d886b317b83ff0437d7",
+        "rev": "f20cd90e28fe0403873f473b29e42662cd86e8c4",
         "type": "github"
       },
       "original": {
