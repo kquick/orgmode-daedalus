@@ -15,21 +15,8 @@ dev =
         in dir = {TopDir}
         exec = |
           set -e
-          nix run .#depmgr flake_update kquick
-          nix run .#depmgr flake_update galoisinc
-          nix run .#depmgr flake_update mesabloo
-          nix run .#depmgr cabal2nix ./nix diagnose-src
-          nix run .#depmgr cabal2nix ./nix alex-tools-src
-          nix run .#depmgr cabal2nix ./nix bv-sized-src
-          nix run .#depmgr cabal2nix ./nix language-rust-src
-          nix run .#depmgr cabal2nix ./nix daedalus-src
-          nix run .#depmgr cabal2nix ./nix daedalus-src daedalus-core
-          nix run .#depmgr cabal2nix ./nix daedalus-src daedalus-vm
-          nix run .#depmgr cabal2nix ./nix daedalus-src daedalus-utils
-          nix run .#depmgr cabal2nix ./nix daedalus-src daedalus-value
-          nix run .#depmgr cabal2nix ./nix daedalus-src rts-hs
-          nix run .#depmgr cabal2nix ./nix daedalus-src rts-hs-data
-          nix run .#depmgr cabal2nix ./nix daedalus-src rts-vm-hs
+          nix run .#depmgr flake_update kquick galoisinc mesabloo
+          nix run .#depmgr cabal2nixMany ./nix diagnose-src alex-tools-src bv-sized-src language-rust-src daedalus-src daedalus-src/daedalus-core daedalus-src/daedalus-vm daedalus-src/daedalus-utils daedalus-src/daedalus-value daedalus-src/rts-hs daedalus-src/rts-hs-data daedalus-src/rts-vm-hs
 
     build:nix-deriv
       Builds local (cached) derivation
