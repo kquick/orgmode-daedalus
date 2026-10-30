@@ -62,7 +62,6 @@ import           Numeric.Natural
 import           OrgMode.Parse
 import           Path
 import qualified Path.IO as PIO
-import qualified Prettyprinter as PP
 import           Text.Read ( readMaybe )
 import           Text.Sayable
 
@@ -94,14 +93,10 @@ data OrgIDoc = OrgIDoc { orgDoc :: OrgDoc
                          -- module and is not accessible by callers.
                        }
 
-instance Show OrgIDoc where
-  show d = sez @"info" $ t'"OrgIDoc incl=" &? (includeFile d) &- t'" (internal:" &- show (_internal d) &+ ')'
-
 data OrgIDocInternal = OIDI { _location :: Maybe Location
                               -- Nothing means no more include settings in the
                               -- file.
                             }
-                       deriving Show -- KWQ TODO remove show with tracing removal
 
 -- Location is where we can find the include directive, which is a sequence of
 -- section indices terminating in an count of the include setting instances in
@@ -122,7 +117,13 @@ data Location = Section Natural Location
               | InclSettingNumAt Natural Natural
                 -- ^ Like InclSettingNum, but the second Natural indicates the
                 -- level at which this setting should be added.
-  deriving (Eq, Show) -- KWQ TODO remove show with tracing removal
+              deriving Eq
+
+instance Sayable saytag Location where
+  sayable = \case
+    Section n l -> 'S' &+ n &+ '.' &+ l
+    InclSettingNum n -> '#' &+ n
+    InclSettingNumAt n l -> '#' &+ n &+ '(' &+ '@' &+ l &+ ')'
 
 makeLenses ''OrgIDoc
 makeLenses ''OrgIDocInternal
@@ -166,7 +167,6 @@ type DocIncludesInfo = [(Name "org-mode include filename", Location)] -- KWQ: TO
 docIncludes :: OrgDoc -> DocIncludesInfo
 docIncludes d =
   let bodyIncludes :: HasField "body" p (DV.Vector OrgBody)
-                   => Show p
                    => IsOrgDoc p
                    => p -> [(Name "org-mode include filename", Location)]
       bodyIncludes p =
@@ -364,7 +364,7 @@ insertOrgModeDocument subdoc maindoc =
         case dropWhile ((/=) loc . snd . snd) $ zip [0..] origIncludes of
           (i:_) -> fst i
           [] -> error $ sez @"error"
-                $ t'"Current include location" &- show loc &- t'"not found!"
+                $ t'"Current include location" &- loc &- t'"not found!"
       newIncludes =
         if null origIncludes -- unlikely: we just did one!
         then newIncludesAll
@@ -426,7 +426,6 @@ stringToDVec = DV.fromList . fmap (DN.toUInt . toEnum . ord)
 data IncludeInfo = IncludeInfo { inclFileSpec :: Name "org-mode include filename"
                                , inclMinLevel :: Maybe Natural
                                }
-                   deriving Show
 
 includeInfo :: OrgBody -> Maybe IncludeInfo
 includeInfo = \case
@@ -461,12 +460,6 @@ uint8ToNatural = toEnum . fromEnum . DN.fromUInt
 naturalToUInt8 :: Natural -> DN.UInt 8
 naturalToUInt8 = DN.uint8 . toEnum . fromEnum
 
-     -- KWQ: update all locations after this one to decrement any InclSettingNum in the same section ... in helper below
-
-instance Sayable saytag DocIncludesInfo where  -- KWQ: remove when tracing removed
-  sayable dii = PP.align . PP.vcat &!* (('→' &-) <$> dii)
-instance Sayable saytag (Name "org-mode include filename", Location) where  -- KWQ: remove when tracing removed
-  sayable (f,l) = nameText f &- '@' &- show l
 
 ----------------------------------------------------------------------
 
@@ -630,9 +623,6 @@ pathMaybeRelative rd rf = case rf of
                             Abs _ -> rf
                             Rel rf' -> mapSomeBase (</> rf') rd
 
-
--- instance Sayable saytag (SomeBase Dir, Natural) where -- KWQ: remove when traces removed
---   sayable (d,n) = '(' &+ show d &- t'"for" &- n &- t'"includes)"
 
 ----------------------------------------------------------------------
 
