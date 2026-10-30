@@ -365,12 +365,14 @@ instance Sayable "text-style1" Block where
   sayable blk =
     case DV.vecToString $ getField @"type" blk of
       code | (toUpper <$> code) == "SRC" ->
-        let clines = foldlNES addLine (DV.toList $ getField @"contents" blk)
-            addLine a b = a &< '│' &- b
+        let clines = foldlNES' addLine ((PP.annotate #code &!) . sayable)
+                     (DV.toList $ getField @"contents" blk)
+            addLine a b = a &< '│' &- PP.annotate #code &! b
         in "┌────" &< '│' &- clines &< "└────"
       code | (toUpper <$> code) == "EXAMPLE" ->
-        let clines = foldlNES addLine (DV.toList $ getField @"contents" blk)
-            addLine a b = a &< '│' &- b
+        let clines = foldlNES' addLine ((PP.annotate #example &!) . sayable)
+                     (DV.toList $ getField @"contents" blk)
+            addLine a b = a &< '│' &- PP.annotate #example &! b
         in "┌────" &< '│' &- clines &< "└────"
       code | (toUpper <$> code) == "QUOTE" ->
         PP.indent 6 &! foldlNES (&-) (stripLeadingWhitespace

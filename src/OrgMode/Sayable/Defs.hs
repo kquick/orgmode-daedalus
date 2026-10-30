@@ -21,6 +21,7 @@ module OrgMode.Sayable.Defs
   -- internal use:
     LinkCollector(collectLinks)
   , foldlNES
+  , foldlNES'
   , blank
   , withBlankLine
   , stripLeadingWhitespace
@@ -48,6 +49,15 @@ foldlNES :: forall saytag a .
 foldlNES op = \case
   [] -> sayable @saytag ""
   (a:as) -> foldl op (sayable @saytag a) as
+
+foldlNES' :: forall saytag a .
+             Sayable saytag a
+          => (Saying saytag -> a -> Saying saytag)
+          -> (a -> Saying saytag)
+          -> [a] -> Saying saytag
+foldlNES' op firstOp = \case
+  [] -> sayable @saytag ""
+  (a:as) -> foldl op (firstOp a) as
 
 
 blank :: Saying saytag
