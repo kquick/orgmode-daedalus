@@ -244,7 +244,7 @@ insertOrgModeDocument subdoc maindoc =
             replN n' (b:bs) =
               case b of
                 IncludeDirective _ | n' == 0 ->
-                  if depth == l - 1
+                  if depth + 1 == l || (depth == l && l == 0)
                   then Right (insertHere bs secs ((+) lvl) subdoc')
                   else
                     let sbody = DV.toList $ getField @"body" subdoc'
