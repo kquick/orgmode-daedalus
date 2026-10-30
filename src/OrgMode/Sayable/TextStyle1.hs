@@ -193,7 +193,7 @@ instance
         addTodoAnn o = PP.annotate #todo &! o
         hdr = let h = orgMarkupParseLine $ getField @"header" s
                   sn = sez @"text-style1" $ '.' &:* slLevel sl
-                  l = maximum (displayLength <$> h) + length sn + 1
+                  l = maximum (0 : (displayLength <$> h)) + length sn + 1
                       + maybe 0 (succ . length . DV.vecToString)
                         (getField @"todo" s)
               in case asInt (getField @"level" s) of
