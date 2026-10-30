@@ -10,6 +10,8 @@ import           Data.Version ( showVersion )
 import           Options.Applicative
 import           Options.Applicative.Help ( paragraph, vsepChunks )
 import           OrgMode
+import qualified Path as P
+import qualified Path.IO as PIO
 import           Paths_orgmode_daedalus ( version )
 import           System.IO
 import           System.Exit
@@ -52,13 +54,17 @@ main = do args <- customExecParser (prefs showHelpOnError) opts
               do hPutStrLn stderr $ sez @"error" $ "Parse failed:" &- err
                  exitFailure
             Right parsed ->
-              case exportFormat args of
-                Nothing -> emit args $ show parsed
-                Just f -> case lookup f formats of
-                  Just emitter -> emit args $ emitter parsed
-                  Nothing ->
-                    do hPutStrLn stderr $ sez @"error" $ "Unknown format:" &- f
-                       exitFailure
+              do here <- P.Abs <$> PIO.getCurrentDir
+                 (sts,doc) <- insertAllInclusions here parsed
+                 mapM_ (hPutStrLn stderr . sez @"error") sts
+                 case exportFormat args of
+                   Nothing -> emit args show doc
+                   Just f ->
+                     case lookup f formats of
+                       Just emitter -> emit args $ emitter doc
+                       Nothing ->
+                         do hPutStrLn stderr $ sez @"error" $ "Unknown format:" &- f
+                            exitFailure
           exitSuccess
   where
     emit args out = case outFile args of

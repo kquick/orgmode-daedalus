@@ -76,6 +76,8 @@ executable orgmode
     autogen-modules:  Paths_orgmode_daedalus
     build-depends:    base
                     , named-text
+                    , path
+                    , path-io
                     , optparse-applicative
                     , orgmode-daedalus
                     , sayable
