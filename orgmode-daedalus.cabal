@@ -79,6 +79,7 @@ executable orgmode
                     , path
                     , path-io
                     , prettyprinter
+                    , prettyprinter-ansi-terminal >= 1.1 && < 1.2
                     , optparse-applicative
                     , orgmode-daedalus
                     , sayable
