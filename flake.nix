@@ -168,7 +168,7 @@
               language-rust = mkHaskell "language-rust" language-rust-src {};
               microlens = named-text.packages."${system}".microlens;
               rts-hs = mkHaskell "rts-hs" "${daedalus-src}/rts-hs" {
-                inherit rts-hs-data;
+                inherit daedalus-utils rts-hs-data;
               };
               rts-hs-data =
                 mkHaskell "rts-hs-data" "${daedalus-src}/rts-hs-data" {};

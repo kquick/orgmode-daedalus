@@ -11,8 +11,8 @@ mkDerivation {
   version = "1.0";
   src = fetchgit {
     url = "https://github.com/galoisinc/daedalus";
-    sha256 = "0f3n0zhbp8q63l0b5xbx424m24y3cag3p8p12fc3k119gmcd0k9g";
-    rev = "9afef8242f7289971550ab43d472d284b82766b0";
+    sha256 = "04rwdvibphb0zyca3dbx1zmn4r5yg9m48dld4v4bbw78v25nwya5";
+    rev = "7cd6f1c0e5a061c158e6b1aaa879fdc530870210";
     fetchSubmodules = true;
   };
   isLibrary = true;
