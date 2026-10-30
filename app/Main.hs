@@ -1,24 +1,32 @@
+{-# LANGUAGE AllowAmbiguousTypes #-}
 {-# LANGUAGE CPP #-}
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeApplications #-}
 
+import qualified Data.List as L
 import           Data.Name
 import           Data.String ( fromString )
 import qualified Data.Text as T
 import qualified Data.Text.IO as TIO
 import           Data.Version ( showVersion )
+import           Numeric.Natural ( Natural )
 import           Options.Applicative
 import           Options.Applicative.Help ( paragraph, vsepChunks )
 import           OrgMode
 import qualified Path as P
 import qualified Path.IO as PIO
 import           Paths_orgmode_daedalus ( version )
-import           System.IO
+import qualified Prettyprinter as PP
+import qualified Prettyprinter.Render.String as PS
 import           System.Exit
+import           System.IO
 import           Text.Sayable
 
 
 data Params = Params { exportFormat :: Maybe (Name "format")
+                     , outWidth :: Natural
                      , outFile :: Maybe (Name "output filename")
                      , inpFile :: Name "input name"
                      }
@@ -28,8 +36,19 @@ params :: Parser Params
 params = Params
          <$> optional
              (option str (long "format" <> short 'f'
-                          <> help "Output format (default = parsed AST)"
+                          <> help (unwords
+                                   [ "Output format (default = parsed AST)."
+                                   , "Valid:"
+                                   , (L.intercalate ", "
+                                      (T.unpack . nameText . fst <$> formats))
+                                   ]
+                                  )
                          ))
+         <*> (option auto (long "width" <> short 'w'
+                          <> help "Output width, if applicable"
+                          <> showDefault
+                          <> value 74
+                          ))
          <*> optional
              (option str (long "output" <> short 'o'
                           <> help "Output filename (default = stdout)"
@@ -38,11 +57,18 @@ params = Params
                            <> help "Input org-mode file to process"
                           )
 
-formats :: [(Name "format", OrgDoc -> String)]
-formats = [ (fromString "text", sez @"text")
-          , (fromString "text-style1", sez @"text-style1")
-          , (fromString "html", sez @"html")
+formats :: [(Name "format", Params -> OrgDoc -> String)]
+formats = [ (fromString "text", textEmitter @"text")
+          , (fromString "text-style1", textEmitter @"text-style1")
+          , (fromString "html", const $ sez @"html")
           ]
+
+textEmitter :: forall format . Sayable format OrgDoc => Params -> OrgDoc -> String
+textEmitter p doc =
+  let w = max 10 $ fromEnum $ outWidth p
+      opts = PP.LayoutOptions $ PP.AvailablePerLine w 0.95
+      doc' = PP.layoutSmart opts $ saying $ sayable @format doc
+  in PS.renderString doc'
 
 main :: IO ()
 main = do args <- customExecParser (prefs showHelpOnError) opts
@@ -58,10 +84,10 @@ main = do args <- customExecParser (prefs showHelpOnError) opts
                  (sts,doc) <- insertAllInclusions here parsed
                  mapM_ (hPutStrLn stderr . sez @"error") sts
                  case exportFormat args of
-                   Nothing -> emit args show doc
+                   Nothing -> emit args $ show doc
                    Just f ->
                      case lookup f formats of
-                       Just emitter -> emit args $ emitter doc
+                       Just emitter -> emit args $ emitter args doc
                        Nothing ->
                          do hPutStrLn stderr $ sez @"error" $ "Unknown format:" &- f
                             exitFailure

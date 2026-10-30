@@ -78,6 +78,7 @@ executable orgmode
                     , named-text
                     , path
                     , path-io
+                    , prettyprinter
                     , optparse-applicative
                     , orgmode-daedalus
                     , sayable
