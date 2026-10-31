@@ -75,6 +75,7 @@ executable orgmode
     other-modules:    Paths_orgmode_daedalus
     autogen-modules:  Paths_orgmode_daedalus
     build-depends:    base
+                    , directory
                     , named-text
                     , path
                     , path-io

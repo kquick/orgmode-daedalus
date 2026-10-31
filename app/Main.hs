@@ -24,6 +24,7 @@ import           Paths_orgmode_daedalus ( version )
 import qualified Prettyprinter as PP
 import qualified Prettyprinter.Render.Terminal as PR
 import qualified Prettyprinter.Render.Text as PT
+import           System.Directory ( canonicalizePath )
 import           System.Exit
 import           System.IO
 import           Text.Sayable
@@ -100,7 +101,8 @@ textEmitter p doc =
 main :: IO ()
 main = do isTerm <- hIsTerminalDevice stdout
           args <- customExecParser (prefs showHelpOnError) (opts isTerm)
-          inp <- fromText <$> TIO.readFile (T.unpack $ nameText $ inpFile args)
+          let inpFP = T.unpack $ nameText $ inpFile args
+          inp <- fromText <$> TIO.readFile inpFP
           let errmsg = fromString "bad org file"
           let p = orgStructureParse (inpFile args) inp errmsg
           case p of
@@ -108,7 +110,15 @@ main = do isTerm <- hIsTerminalDevice stdout
               do hPutStrLn stderr $ sez @"error" $ t'"Parse failed:" &- err
                  exitFailure
             Right parsed ->
-              do here <- P.Abs <$> PIO.getCurrentDir
+              do -- here <- P.Abs <$> PIO.getCurrentDir
+                 absInpFP <- canonicalizePath inpFP
+                 here <- case P.parseSomeFile absInpFP of
+                              Just sf -> return $ P.mapSomeBase P.parent sf
+                              Nothing ->
+                                -- Unexpected: we already read this file so the
+                                -- path should be valid.  Nonetheless, use the
+                                -- current directory as a fallback.
+                                P.Abs <$> PIO.getCurrentDir
                  (sts,doc) <- insertAllInclusions here parsed
                  mapM_ (hPutStrLn stderr . sez @"error") sts
                  case exportFormat args of
